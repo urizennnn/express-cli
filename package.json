@@ -1,0 +1,22 @@
+{
+  "name": "express-cli",
+  "version": "1.0.0",
+  "description": "\"A cli tool to generate express application code\"",
+  "main": "\"\"",
+  "scripts": {
+    "test": "\"\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git remote add origin https://github.com/urizennnn/express-cli.git"
+  },
+  "keywords": [
+    "\"\""
+  ],
+  "author": "Victor Akaaha",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "yargs": "^17.7.2"
+  }
+}
