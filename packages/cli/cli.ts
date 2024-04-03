@@ -33,18 +33,20 @@ const question = [
 ];
 
 export function createExpress() {
-    prompt(question).then((answer: {
-        database: string;
-        dependency: string;
-        package: string;
-        language: string;
+  prompt(question).then(
+    (answer: {
+      database: string;
+      dependency: string;
+      package: string;
+      language: string;
     }) => {
-        preferences.database = answer.database;
-        preferences.injection = answer.dependency;
-        preferences.packageManager = answer.package;
-        preferences.language = answer.language;
-        return preferences
-    });
+      preferences.database = answer.database;
+      preferences.injection = answer.dependency;
+      preferences.packageManager = answer.package;
+      preferences.language = answer.language;
+      return preferences;
+    }
+  );
 }
 
 export async function installDependencies(flags?: string, ...args: string[]) {
@@ -56,21 +58,57 @@ export async function installDependencies(flags?: string, ...args: string[]) {
 
   const interval = loadingBar("Installing");
 
-  exec(
-    `npm install ${flags} ${argv}`,
-    (error: ExecException | null, stdout: string, stderr: string) => {
-      clearInterval(interval);
-      process.stdout.clearLine(0);
-      process.stdout.cursorTo(0);
-      process.stdout.write("\nInstalled [.........]");
-      if (error) {
-        console.error(`npm install error: ${error.message}`);
-        return;
-      }
+  if (preferences.packageManager === "yarn") {
+    exec(
+      `${preferences.packageManager} add ${flags} ${argv}`,
+      (error: ExecException | null, stdout: string, stderr: string) => {
+        clearInterval(interval);
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write("\nInstalled [.........]");
+        if (error) {
+          console.error(
+            `${preferences.packageManager} install error: ${error.message}`
+          );
+          return;
+        }
 
-      console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
-    }
-  );
+        console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
+      }
+    );
+  } else if (preferences.packageManager === "pnpm") {
+    exec(
+      `${preferences.packageManager} install ${flags} ${argv}`,
+      (error: ExecException | null, stdout: string, stderr: string) => {
+        clearInterval(interval);
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write("\nInstalled [.........]");
+        if (error) {
+          console.error(`npm install error: ${error.message}`);
+          return;
+        }
+
+        console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
+      }
+    );
+  } else {
+    exec(
+      `npm install ${flags} ${argv}`,
+      (error: ExecException | null, stdout: string, stderr: string) => {
+        clearInterval(interval);
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write("\nInstalled [.........]");
+        if (error) {
+          console.error(`npm install error: ${error.message}`);
+          return;
+        }
+
+        console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
+      }
+    );
+  }
 }
 
 export async function removeDependencies(...args: string[]) {
