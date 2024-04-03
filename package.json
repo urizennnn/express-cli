@@ -16,7 +16,11 @@
   "author": "Victor Akaaha",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^11.2.0",
+    "@types/inquirer": "^9.0.7",
+    "@types/yargs": "^17.0.32",
+    "chalk": "^4.0.0",
+    "hygen": "^6.2.11",
+    "inquirer": "^8.2.5",
     "yargs": "^17.7.2"
   }
 }
