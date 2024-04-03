@@ -28,26 +28,26 @@ const cli_config_1 = require("../config/cli.config");
 const child_process_1 = require("child_process");
 const question = [
     {
-        type: 'list',
-        name: 'package',
-        message: 'Choose package manager',
-        choices: ['npm', 'yarn', 'pnpm'],
-        default: 'npm',
+        type: "list",
+        name: "package",
+        message: "Choose package manager",
+        choices: ["npm", "yarn", "pnpm"],
+        default: "npm",
     },
     {
-        type: 'list',
-        name: 'language',
-        message: 'Choose language',
-        choices: ['JavaScript', 'TypeScript'],
-        default: 'JavaScript',
+        type: "list",
+        name: "language",
+        message: "Choose language",
+        choices: ["JavaScript", "TypeScript"],
+        default: "JavaScript",
     },
     {
-        type: 'list',
-        name: 'dependency',
-        message: 'Would you like to add pre installed dependencies or a fresh start?',
-        choices: ['pre installed', 'fresh start'],
-        default: 'pre installed',
-    }
+        type: "list",
+        name: "dependency",
+        message: "Would you like to add pre installed dependencies or a fresh start?",
+        choices: ["pre installed", "fresh start"],
+        default: "pre installed",
+    },
 ];
 function createExpress() {
     (0, cli_config_1.prompt)(question).then((answer) => {
@@ -55,18 +55,21 @@ function createExpress() {
     });
 }
 exports.createExpress = createExpress;
-function installDependencies(...args) {
-    const argv = args.join(' ');
-    Promise.resolve().then(() => __importStar(require('chalk'))).then(chalk => {
-        (0, child_process_1.exec)(`npm install ${argv}`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`npm install error: ${error.message}`);
-                return;
-            }
-            console.log(chalk.default.green(`Successfully installed ${argv}.`));
-        });
-    }).catch(error => {
-        console.error(`Error loading chalk: ${error}`);
+async function installDependencies(...args) {
+    const argv = args.join(" ");
+    const chalk = await Promise.resolve().then(() => __importStar(require("chalk")));
+    console.log(chalk.default.green(`Installing ${argv}...`));
+    const interval = (0, cli_config_1.loadingBar)();
+    (0, child_process_1.exec)(`npm install ${argv}`, (error, stdout, stderr) => {
+        clearInterval(interval);
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
+        process.stdout.write("\nInstalled [.........]");
+        if (error) {
+            console.error(`npm install error: ${error.message}`);
+            return;
+        }
+        console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
     });
 }
 exports.installDependencies = installDependencies;
