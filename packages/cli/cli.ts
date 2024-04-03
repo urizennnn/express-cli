@@ -1,5 +1,7 @@
-import { prompt, loadingBar, preferences } from "../config/cli.config";
+import fs from "fs";
+import { prompt, loadingBar, preferences, devDependencies, getDevice } from "../config/cli.config";
 import { exec, ExecException } from "child_process";
+import { dependencies } from "../config/cli.config";
 
 const question = [
   {
@@ -32,7 +34,7 @@ const question = [
   },
 ];
 
-export function createExpress() {
+export function createExpress(name: string) {
   prompt(question).then(
     (answer: {
       database: string;
@@ -44,7 +46,26 @@ export function createExpress() {
       preferences.injection = answer.dependency;
       preferences.packageManager = answer.package;
       preferences.language = answer.language;
-      return preferences;
+const device = getDevice();
+
+      const path = `C:/Users/${device}/Desktop/${name}`;
+      fs.mkdirSync(path);
+      process.chdir(path);
+      exec(
+        `${preferences.packageManager} init -y `,
+        (error: ExecException | null, stdout: string, stderr: string) => {
+          if (error) {
+            console.error(
+              `${preferences.packageManager} install error: ${error.message}`
+            );
+            return;
+          }
+        }
+      );
+      if (preferences.injection === "pre installed") {
+        installDependencies(...dependencies)
+        if (preferences.language === 'TypeScript') installDependencies('-D',...devDependencies)
+      }
     }
   );
 }

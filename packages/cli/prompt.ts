@@ -2,14 +2,16 @@
 import yargs from "yargs";
 const { args } = require("../config/cli.config");
 import { createExpress, installDependencies, removeDependencies } from "./cli";
+const Generator = require('../../generator-express/generators/index.js')
 
 yargs.command({
   command: "create <appName>", 
   aliases: ["new"],
   describe: "Create a new express app",
   handler(args) {
-    // const appName = args.appName; 
-    createExpress(); 
+    const appName = args.appName; 
+    let generator = new Generator();
+    createExpress(appName); 
     // console.log(appName)
   },
 });
