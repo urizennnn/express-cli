@@ -32,7 +32,7 @@ export function createExpress() {
   });
 }
 
-export async function installDependencies(...args: string[]) {
+export async function installDependencies(flags?: string, ...args: string[]) {
   const argv = args.join(" ");
 
   const chalk = await import("chalk");
@@ -42,11 +42,11 @@ export async function installDependencies(...args: string[]) {
   const interval = loadingBar();
 
   exec(
-    `npm install ${argv}`,
+    `npm install ${flags} ${argv}`,
     (error: ExecException | null, stdout: string, stderr: string) => {
       clearInterval(interval);
-      process.stdout.clearLine(0); 
-      process.stdout.cursorTo(0); 
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
       process.stdout.write("\nInstalled [.........]");
       if (error) {
         console.error(`npm install error: ${error.message}`);

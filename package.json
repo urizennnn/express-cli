@@ -22,5 +22,9 @@
     "hygen": "^6.2.11",
     "inquirer": "^8.2.5",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2"
   }
 }
