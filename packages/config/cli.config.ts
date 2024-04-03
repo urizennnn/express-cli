@@ -64,9 +64,8 @@ export function getDevice() {
 
   if (match && match[1]) {
     const deviceName = match[1];
-    console.log("Device Name:", deviceName);
-  } else {
-    console.error("Device name not found in path:", pathString);
-  }
+    return deviceName
+  } 
+  
 }
 
