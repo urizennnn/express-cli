@@ -1,20 +1,26 @@
-import { prompt, args, loadingBar } from "../config/cli.config";
+import { prompt, loadingBar, preferences } from "../config/cli.config";
 import { exec, ExecException } from "child_process";
 
 const question = [
   {
     type: "list",
     name: "package",
-    message: "Choose package manager",
+    message: "Choose package manager?",
     choices: ["npm", "yarn", "pnpm"],
     default: "npm",
   },
   {
     type: "list",
     name: "language",
-    message: "Choose language",
+    message: "Choose language?",
     choices: ["JavaScript", "TypeScript"],
     default: "JavaScript",
+  },
+  {
+    type: "list",
+    name: "database",
+    message: "What database are you using?",
+    choices: ["MongoDB", "MSQL", "PGSQL", "Other"],
   },
   {
     type: "list",
@@ -27,9 +33,18 @@ const question = [
 ];
 
 export function createExpress() {
-  prompt(question).then((answer) => {
-    return console.log(answer);
-  });
+    prompt(question).then((answer: {
+        database: string;
+        dependency: string;
+        package: string;
+        language: string;
+    }) => {
+        preferences.database = answer.database;
+        preferences.injection = answer.dependency;
+        preferences.packageManager = answer.package;
+        preferences.language = answer.language;
+        return preferences
+    });
 }
 
 export async function installDependencies(flags?: string, ...args: string[]) {
@@ -39,7 +54,7 @@ export async function installDependencies(flags?: string, ...args: string[]) {
 
   console.log(chalk.default.green(`Installing ${argv}...`));
 
-  const interval = loadingBar();
+  const interval = loadingBar("Installing");
 
   exec(
     `npm install ${flags} ${argv}`,
@@ -54,6 +69,32 @@ export async function installDependencies(flags?: string, ...args: string[]) {
       }
 
       console.log(chalk.default.green(`\nSuccessfully installed ${argv}.`));
+    }
+  );
+}
+
+export async function removeDependencies(...args: string[]) {
+  const argv = args.join(" ");
+
+  const chalk = await import("chalk");
+
+  console.log(chalk.default.green(`Removing ${argv}...`));
+
+  const interval = loadingBar("Removing");
+
+  exec(
+    `npm remove ${argv}`,
+    (error: ExecException | null, stdout: string, stderr: string) => {
+      clearInterval(interval);
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write("\nRemoved [.........]");
+      if (error) {
+        console.error(`npm remove error: ${error.message}`);
+        return;
+      }
+
+      console.log(chalk.default.green(`\nSuccessfully removed ${argv}.`));
     }
   );
 }
