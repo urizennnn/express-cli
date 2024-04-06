@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-const { hideBin } = require("yargs/helpers");
+import { hideBin } from "yargs/helpers";
+import path from "node:path";
+import minimist from "minimist";
 import inquirer from "inquirer";
-interface User {
+
+export interface User {
   packageManager: string;
   language: string;
   injection: string;
@@ -11,7 +14,7 @@ interface User {
 export const args = hideBin(process.argv);
 export const prompt = inquirer.createPromptModule();
 
-export function loadingBar(command: string) {
+export function loadingBar(command:string) {
   const totalTicks = 10;
   let ticks = 0;
   const loadingInterval = setInterval(() => {
@@ -28,7 +31,7 @@ export function loadingBar(command: string) {
   return loadingInterval;
 }
 
-export let preferences: User = {
+export let preferences :User= {
   packageManager: "",
   language: "",
   injection: "",
@@ -56,16 +59,4 @@ export const devDependencies = [
   "prettier",
 ];
 
-
-export function getDevice() {
-  const pathString = __dirname;
-  const regex = /C:\\Users\\([^\\]+)\\Desktop\\@express-cli/;
-  const match = pathString.match(regex);
-
-  if (match && match[1]) {
-    const deviceName = match[1];
-    return deviceName
-  } 
-  
-}
 

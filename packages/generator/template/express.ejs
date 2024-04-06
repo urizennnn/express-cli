@@ -1,0 +1,23 @@
+<% const express = require('express'); %>
+
+
+<% // Initialize Express app %>
+<% const app = express(); %>
+
+<% // Set EJS as the view engine %>
+<% app.set('view engine', 'ejs'); %>
+<% app.set('views', path.join(__dirname, 'views')); %>
+
+<% // Middleware to serve static files %>
+
+
+<% // Define routes %>
+<% app.get('/', (req, res) => { %>
+    <h1>Welcome to my Express App!</h1>
+<% }); %>
+
+<% // Start the server %>
+<% const PORT = process.env.PORT || 3000; %>
+<% app.listen(PORT, () => { %>
+    <p>Server is running on port <%= PORT %></p>
+<% }); %>
