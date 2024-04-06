@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-import yargs from "yargs";
-const { args } = require("../config/cli.config");
-import { createExpress, installDependencies, removeDependencies } from "./cli";
-const Generator = require('../../generator-express/generators/index.js')
+import  yargs from "yargs";
+import {args} from "../../config/cli.config.js"
+import { createExpress, installDependencies, removeDependencies } from "./cli.js";
 
 yargs.command({
   command: "create <appName>", 
@@ -10,9 +9,7 @@ yargs.command({
   describe: "Create a new express app",
   handler(args) {
     const appName = args.appName; 
-    let generator = new Generator();
     createExpress(appName); 
-    // console.log(appName)
   },
 });
 
@@ -36,8 +33,9 @@ yargs.command({
       }
     }
     flag = `-${flag}`;
-    const packageNames = args._.slice(1)  as string[];
-    packageNames.push(entry);
+    const packageNames = args._.slice(1) as string[]
+	  packageNames.push(entry);
+
     installDependencies(flag, ...packageNames);
   },
 });
@@ -47,7 +45,7 @@ yargs.command({
   aliases:['uninstall','ui','rm'],
   describe:'remove dependencies',
   handler: (args)=>{
-       const packageNames = args._.slice(1) as string[];
+       const packageNames = args._.slice(1) as string[]
        removeDependencies(...packageNames)
   }
 })
