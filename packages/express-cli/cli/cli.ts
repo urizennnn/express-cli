@@ -44,9 +44,9 @@ export async function createExpress(name: string) {
 			preferences.packageManager = answer.package;
 
 			if (preferences.language === "TypeScript") {
-				await generateFiles(name, process.cwd(), "templates", ".ts");
+				await generateFiles(process.cwd(), "templates", "ts", name);
 			} else {
-				await generateFiles(name, process.cwd(), "templates",".js");
+				await generateFiles(process.cwd(), "templates","js",name);
 			}
 
 

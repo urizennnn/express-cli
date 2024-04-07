@@ -1,35 +1,32 @@
-import chalk from "chalk";
 import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
 
-export const generateFiles = async (name: string, target: string, template: string, desiredExtension: string) => {
-    const templateDir = path.join(__dirname, template);
-    const targetDir = path.join(target, name);
+export const generateFiles = async (targetDir:string, templateDir:string, extension:string,cdname?:string) => {
+	const templatePath = path.join(__dirname, templateDir);
+    let appName = cdname as string
+	const targetPath = path.join(targetDir, appName);
+	await fs.ensureDir(targetPath);
 
-    if (fs.existsSync(targetDir)) {
-        console.log(chalk.red(`Folder ${name} already exists`));
-        process.exit(1);
+	const files = await fs.readdir(templatePath);
+	for (const file of files) {
+		const filePath = path.join(templatePath, file);
+		const stats = await fs.stat(filePath);
+
+		if (stats.isFile()) {
+			console.log(file)
+			const template = await fs.readFile(filePath, "utf-8");
+			const rendered = ejs.render(template, { appName });
+			const targetFilePath = path.join(
+				targetPath,
+				`${path.parse(file).name}.${extension}`
+			);
+
+			await fs.writeFile(targetFilePath, rendered);
+
+		}  else if (stats.isDirectory()) {
+      const subDir = path.join(templateDir, file);
+      await generateFiles(targetPath, subDir, extension,path.basename(file));
     }
-
-    fs.mkdirSync(targetDir);
-
-    const templateFiles = fs.readdirSync(templateDir);
-
-    for (const file of templateFiles) {
-        const filePath = path.join(templateDir, file);
-        const fileStat = fs.statSync(filePath);
-
-        if (fileStat.isDirectory()) {
-            await generateFiles(name, targetDir, path.join(template, file), desiredExtension); // Pass path.join(template, file) instead of filePath
-        } else {
-            const fileContent = fs.readFileSync(filePath, "utf-8");
-            const fileName = file.replace(/\.ejs$/, desiredExtension);
-            const targetFilePath = path.join(targetDir, fileName);
-
-            const renderedContent = ejs.render(fileContent, { name });
-
-            fs.writeFileSync(targetFilePath, renderedContent);
         }
-    }
 };

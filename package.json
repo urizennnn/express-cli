@@ -1,8 +1,7 @@
 {
   "name": "@urizen/express-cli",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "license": "MIT",
-  "type": "module",
   "dependencies": {
     "@types/ejs": "^3.1.5",
     "@types/fs-extra": "^11.0.4",
@@ -18,7 +17,7 @@
     "yargs": "^17.7.2"
   },
   "bin": {
-    "express-cli": "packages/express-cli/prompt.ts"
+    "express": "./dist/packages/express-cli/cli/prompt.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
