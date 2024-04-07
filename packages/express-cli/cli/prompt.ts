@@ -7,9 +7,9 @@ yargs.command({
   command: "create <appName>", 
   aliases: ["new"],
   describe: "Create a new express app",
-  handler(args) {
+ async handler(args) {
     const appName = args.appName; 
-    createExpress(appName); 
+   await createExpress(appName); 
   },
 });
 

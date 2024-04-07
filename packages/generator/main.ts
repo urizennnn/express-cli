@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 
 export const generateFiles = async (targetDir:string, templateDir:string, extension:string,cdname?:string) => {
-	const templatePath = path.join(__dirname, templateDir);
+	const templatePath = path.join("../../../../packages/generator", templateDir);
     let appName = cdname as string
 	const targetPath = path.join(targetDir, appName);
 	await fs.ensureDir(targetPath);

@@ -43,6 +43,7 @@ export async function createExpress(name: string) {
 			preferences.injection = answer.dependency;
 			preferences.packageManager = answer.package;
 
+			 createFolderAndWriteConfig(preferences);
 			if (preferences.language === "TypeScript") {
 				await generateFiles(process.cwd(), "templates", "ts", name);
 			} else {
@@ -50,7 +51,7 @@ export async function createExpress(name: string) {
 			}
 
 
-			return createFolderAndWriteConfig(preferences);
+			process.exit(0)
 
 		}
 	);
