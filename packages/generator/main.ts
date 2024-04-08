@@ -1,32 +1,39 @@
 import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
-
+import chalk from "chalk";
 export const generateFiles = async (targetDir:string, templateDir:string, extension:string,cdname?:string) => {
-	const templatePath = path.join("../../../../packages/generator", templateDir);
-    let appName = cdname as string
-	const targetPath = path.join(targetDir, appName);
-	await fs.ensureDir(targetPath);
+	try{
+		const templatePath = path.join(__dirname, templateDir);
+		let appName = cdname as string
+		const targetPath = path.join(targetDir, appName);
+		const pathExist = await fs.pathExists(targetPath);
+		if (pathExist){
+			console.log(chalk.red("Folder already exists"))
+			process.exit(1)
+		}
+		await fs.ensureDir(targetPath);
 
-	const files = await fs.readdir(templatePath);
-	for (const file of files) {
-		const filePath = path.join(templatePath, file);
-		const stats = await fs.stat(filePath);
+		const files = await fs.readdir(templatePath);
+		for (const file of files) {
+			const filePath = path.join(templatePath, file);
+			const stats = await fs.stat(filePath);
 
-		if (stats.isFile()) {
-			console.log(file)
-			const template = await fs.readFile(filePath, "utf-8");
-			const rendered = ejs.render(template, { appName });
-			const targetFilePath = path.join(
-				targetPath,
-				`${path.parse(file).name}.${extension}`
-			);
+			if (stats.isFile()) {
+				const template = await fs.readFile(filePath, "utf-8");
+				const rendered = ejs.render(template, { appName });
+				const targetFilePath = path.join(
+					targetPath,
+					`${path.parse(file).name}.${extension}`
+				);
 
-			await fs.writeFile(targetFilePath, rendered);
+				await fs.writeFile(targetFilePath, rendered);
 
-		}  else if (stats.isDirectory()) {
-      const subDir = path.join(templateDir, file);
-      await generateFiles(targetPath, subDir, extension,path.basename(file));
-    }
-        }
-};
+			}  else if (stats.isDirectory()) {
+				const subDir = path.join(templateDir, file);
+				await generateFiles(targetPath, subDir, extension,path.basename(file));
+			}
+		}
+	}catch (e:any){
+		console.log(chalk.red(e))
+	}};
