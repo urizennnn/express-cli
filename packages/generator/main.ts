@@ -4,9 +4,11 @@ import path from "path";
 import chalk from "chalk";
 import {preferences} from "../config/cli.config";
 import { createJsonUponFreshStart } from "../../process/createJSON";
+import { helperInject } from "./inject";
 
 export const generateFiles = async (targetDir:string, templateDir:string,cdname?:string) => {
 	try{
+		await helperInject(preferences.database);
 		const templatePath = path.join(__dirname, templateDir);
 		let appName = cdname as string
 		const targetPath = path.join(targetDir, appName);
@@ -25,6 +27,8 @@ export const generateFiles = async (targetDir:string, templateDir:string,cdname?
 	if (preferences.injection === "fresh start") {
 		createJsonUponFreshStart(preferences.packageManager,targetPath);
 	}
+	
+
 		const files = await fs.readdir(templatePath);
 		for (const file of files) {
 			const filePath = path.join(templatePath, file);
@@ -49,3 +53,5 @@ export const generateFiles = async (targetDir:string, templateDir:string,cdname?
 	}catch (e:any){
 		console.log(chalk.red(e))
 	}};
+
+

@@ -43,10 +43,9 @@ export async function createExpress(name: string): Promise<void> {
 		preferences.packageManager = answer.package;
 
 		createFolderAndWriteConfig(preferences);
-		if (answer.dependency === "fresh start"){
-			await generateFiles(process.cwd(),"templates",name)
-			
-		}
+		
+			await generateFiles(process.cwd(), "templates", name);
+		
 
 
 		process.exit(0);
