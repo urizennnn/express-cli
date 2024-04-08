@@ -1,1 +1,8 @@
-./dist
+packages
+process
+test
+.*
+tsconfig.json
+yarn.lock
+*.bat
+node_modules

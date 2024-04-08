@@ -10,9 +10,9 @@ export async function generateDefault(name:string){
 	const details = await fse.readJson(configFile)
 	
 	if (details.language === "TypeScript"){
-		await generateFiles(process.cwd(),"templates","ts",name)
+		await generateFiles(process.cwd(),"templates",name)
 	} else {
-		await generateFiles(process.cwd(),"templates","js",name)
+		await generateFiles(process.cwd(),"templates",name)
 	}
 
 }

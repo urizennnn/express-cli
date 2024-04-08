@@ -2,18 +2,29 @@ import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
-export const generateFiles = async (targetDir:string, templateDir:string, extension:string,cdname?:string) => {
+import {preferences} from "../config/cli.config";
+import { createJsonUponFreshStart } from "../../process/createJSON";
+
+export const generateFiles = async (targetDir:string, templateDir:string,cdname?:string) => {
 	try{
 		const templatePath = path.join(__dirname, templateDir);
 		let appName = cdname as string
 		const targetPath = path.join(targetDir, appName);
 		const pathExist = await fs.pathExists(targetPath);
 		if (pathExist){
-			console.log(chalk.red("Folder already exists"))
+			console.log(chalk.red(`Folder ${appName} already exists`))
 			process.exit(1)
 		}
 		await fs.ensureDir(targetPath);
-
+		let extension;
+	if (preferences.language === "TypeScript"){
+		extension = "ts"
+	}else {
+		extension = "js"
+	}
+	if (preferences.injection === "fresh start") {
+		createJsonUponFreshStart(preferences.packageManager,targetPath);
+	}
 		const files = await fs.readdir(templatePath);
 		for (const file of files) {
 			const filePath = path.join(templatePath, file);
@@ -29,9 +40,10 @@ export const generateFiles = async (targetDir:string, templateDir:string, extens
 
 				await fs.writeFile(targetFilePath, rendered);
 
+
 			}  else if (stats.isDirectory()) {
 				const subDir = path.join(templateDir, file);
-				await generateFiles(targetPath, subDir, extension,path.basename(file));
+				await generateFiles(targetPath, subDir,path.basename(file));
 			}
 		}
 	}catch (e:any){
