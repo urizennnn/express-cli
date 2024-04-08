@@ -1,35 +1,51 @@
-import chalk from "chalk";
 import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
+import chalk from "chalk";
+import {preferences} from "../config/cli.config";
+import { createJsonUponFreshStart } from "../../process/createJSON";
 
-export const generateFiles = async (name: string, target: string, template: string, desiredExtension: string) => {
-    const templateDir = path.join(__dirname, template);
-    const targetDir = path.join(target, name);
+export const generateFiles = async (targetDir:string, templateDir:string,cdname?:string) => {
+	try{
+		const templatePath = path.join(__dirname, templateDir);
+		let appName = cdname as string
+		const targetPath = path.join(targetDir, appName);
+		const pathExist = await fs.pathExists(targetPath);
+		if (pathExist){
+			console.log(chalk.red(`Folder ${appName} already exists`))
+			process.exit(1)
+		}
+		await fs.ensureDir(targetPath);
+		let extension;
+	if (preferences.language === "TypeScript"){
+		extension = "ts"
+	}else {
+		extension = "js"
+	}
+	if (preferences.injection === "fresh start") {
+		createJsonUponFreshStart(preferences.packageManager,targetPath);
+	}
+		const files = await fs.readdir(templatePath);
+		for (const file of files) {
+			const filePath = path.join(templatePath, file);
+			const stats = await fs.stat(filePath);
 
-    if (fs.existsSync(targetDir)) {
-        console.log(chalk.red(`Folder ${name} already exists`));
-        process.exit(1);
-    }
+			if (stats.isFile()) {
+				const template = await fs.readFile(filePath, "utf-8");
+				const rendered = ejs.render(template, { appName });
+				const targetFilePath = path.join(
+					targetPath,
+					`${path.parse(file).name}.${extension}`
+				);
 
-    fs.mkdirSync(targetDir);
+				await fs.writeFile(targetFilePath, rendered);
 
-    const templateFiles = fs.readdirSync(templateDir);
 
-    for (const file of templateFiles) {
-        const filePath = path.join(templateDir, file);
-        const fileStat = fs.statSync(filePath);
-
-        if (fileStat.isDirectory()) {
-            await generateFiles(name, targetDir, path.join(template, file), desiredExtension); // Pass path.join(template, file) instead of filePath
-        } else {
-            const fileContent = fs.readFileSync(filePath, "utf-8");
-            const fileName = file.replace(/\.ejs$/, desiredExtension);
-            const targetFilePath = path.join(targetDir, fileName);
-
-            const renderedContent = ejs.render(fileContent, { name });
-
-            fs.writeFileSync(targetFilePath, renderedContent);
-        }
-    }
-};
+			}  else if (stats.isDirectory()) {
+				const subDir = path.join(templateDir, file);
+				await generateFiles(targetPath, subDir,path.basename(file));
+			}
+		}
+	}catch (e:any){
+		console.log(chalk.red(e))
+	}};
