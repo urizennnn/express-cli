@@ -4,7 +4,7 @@ const main = path.join(__dirname, "../packages/generator/templates")
 
 
 export async function installMongo (){
-	console.log(main)
+	
 	const tempPath=path.join(main,"Database")
 	const data = `const mongoose = require('mongoose');\n async function Mongoconnect(url) {\n try { \n  await mongoose.connect(url, { serverSelectionTimeoutMS: 5000 });  \n console.log("Connected to the MongoDB database.");\n } catch (error) {\n console.error("Error connecting to the database:", error) \n }}\n\n \n module.exports = Mongoconnect;`
 

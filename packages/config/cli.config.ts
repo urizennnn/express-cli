@@ -45,10 +45,8 @@ export const dependencies = [
   "express-session",
   "helmet",
   "morgan",
-  "multer",
-  "passport",
-  "compression",
   "http-status-codes",
+  "dotenv"
 ];
 
 export const devDependencies = [
