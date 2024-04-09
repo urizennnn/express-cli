@@ -18,7 +18,7 @@ export async function createJsonUponFreshStart(name: string, PackageManager?: st
   }
 
   process.chdir(name);
-  console.log(process.cwd());
+  console.log(chalk.green(`CREATE ${process.cwd()}`));
 
   const generatePackageJson = new Promise<void>((resolve, reject) => {
     exec(`${PackageManager} init -y`, (error: Error | null) => {
