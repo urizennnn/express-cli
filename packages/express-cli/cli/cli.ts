@@ -6,54 +6,59 @@ import chalk from "chalk";
 import { deleteFile } from "../../../process/deleteFile.js";
 import path from "path";
 import { temp } from "./prompt.js";
-
+import { exit } from "node:process";
+import { createJsonUponFreshStart } from "../../../process/createJSON.js";
 
 export async function createExpress(name: string): Promise<void> {
-  const question = [
-    {
-      type: "list",
-      name: "package",
-      message: "Choose package manager?",
-      choices: ["npm", "yarn", "pnpm"],
-      default: "npm",
-    },
-    {
-      type: "list",
-      name: "language",
-      message: "Choose language?",
-      choices: ["JavaScript", "TypeScript"],
-      default: "JavaScript",
-    },
-    {
-      type: "list",
-      name: "database",
-      message: "What database are you using?",
-      choices: ["MongoDB", "MSQL", "PGSQL", "Other"],
-    },
-    {
-      type: "list",
-      name: "dependency",
-      message:
-        "Would you like to add pre installed dependencies or a fresh start?",
-      choices: ["pre installed", "fresh start"],
-      default: "pre installed",
-    },
-  ];
+  try {
+    const question = [
+      {
+        type: "list",
+        name: "package",
+        message: "Choose package manager?",
+        choices: ["npm", "yarn", "pnpm"],
+        default: "npm",
+      },
+      {
+        type: "list",
+        name: "language",
+        message: "Choose language?",
+        choices: ["JavaScript", "TypeScript"],
+        default: "JavaScript",
+      },
+      {
+        type: "list",
+        name: "database",
+        message: "What database are you using?",
+        choices: ["MongoDB", "MSQL", "PGSQL", "Other"],
+      },
+      {
+        type: "list",
+        name: "dependency",
+        message:
+          "Would you like to add pre installed dependencies or a fresh start?",
+        choices: ["pre installed", "fresh start"],
+        default: "pre installed",
+      },
+    ];
 
-  prompt(question).then(async (answer) => {
-    preferences.language = answer.language;
-    preferences.database = answer.database;
-    preferences.injection = answer.dependency;
-    preferences.packageManager = answer.package;
+    prompt(question).then(async (answer) => {
+      preferences.language = answer.language;
+      preferences.database = answer.database;
+      preferences.injection = answer.dependency;
+      preferences.packageManager = answer.package;
 
-    createFolderAndWriteConfig(preferences);
-
-    await generateFiles(process.cwd(), "templates", name,false);
-    // createJsonUponFreshStart(answer.package, path.join(process.cwd(), name));
-    await deleteFile(path.join(temp, "Database")),
-      await deleteFile(path.join(temp, "Models"));
-    process.exit(1);
-  });
+      createFolderAndWriteConfig(preferences);
+      await Promise.all([
+        generateFiles(process.cwd(), "templates", name, true),
+        await deleteFile(path.join(temp, "Database")),
+        await deleteFile(path.join(temp, "Models")),
+      ]);
+    });
+  } catch (e) {
+    console.log(chalk.red(e));
+    exit(1);
+  }
 }
 
 export async function installDependencies(...args: string[]): Promise<void> {

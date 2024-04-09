@@ -9,6 +9,8 @@ import {
 } from "./cli.js";
 import { generateDefault } from "../../../process/readConfig.js";
 import { deleteFile } from "../../../process/deleteFile.js";
+import { exit } from "node:process";
+
 export const temp = path.join(__dirname,"../../generator/templates");
 
 yargs.command({
@@ -35,7 +37,7 @@ yargs.command({
       ]);
       if (response) {
         await generateDefault(appName,true);
-        process.exit(0);
+        exit(0);
       }
     }
    await createExpress(appName)

@@ -1,6 +1,6 @@
 {
   "name": "@urizen/express-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "dependencies": {
     "@types/ejs": "^3.1.5",
@@ -17,7 +17,7 @@
     "yargs": "^17.7.2"
   },
   "bin": {
-    "express": "./dist/packages/express-cli/cli/prompt.js"
+    "cli": "./dist/packages/express-cli/cli/prompt.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -25,7 +25,8 @@
     "jest": "^29.7.0",
     "mocha": "^10.4.0",
     "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
   },
   "description": "For now are in development phase and you can only run script with the folder not outside the folder .",
   "main": "./packages/express-cli/cli/prompt.js",
@@ -33,7 +34,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "tsc -w"
   },
   "repository": {
     "type": "git",

@@ -6,16 +6,24 @@ import { preferences } from "../config/cli.config";
 import { createJsonUponFreshStart } from "../../process/createJSON";
 import { helperInject } from "./inject";
 import { readConfig } from "../../process/readConfig";
+import { injectEnv } from "../../process/injectEnv";
+import { exit } from "node:process";
 
 export const generateFiles = async (
   targetDir: string,
   templateDir: string,
   cdname: string,
-  flag: boolean
+  flag: boolean = false
 ) => {
   try {
-    await helperInject(preferences.database);
-    const data = await readConfig();
+    let data;
+    if (flag) {
+      data = await readConfig();
+    }
+
+    const database = preferences.database || data.database;
+    await helperInject(database);
+    await injectEnv(database);
 
     const templatePath = path.join(__dirname, templateDir);
     const appName = cdname as string;
@@ -24,40 +32,47 @@ export const generateFiles = async (
 
     if (pathExist) {
       console.log(chalk.red(`Folder ${appName} already exists`));
-      process.exit(1);
+      return exit(0);
     }
 
     await fs.ensureDir(targetPath);
-
     let extension;
     extension = preferences.language === "TypeScript" ? "ts" : "js";
 
     if (flag) {
-      createJsonUponFreshStart(targetPath,data.packageManager);
-    } 
-      createJsonUponFreshStart(targetPath, preferences.packageManager);
-    
+      await createJsonUponFreshStart({
+        name: targetPath,
+        PackageManager: data.packageManager || preferences.packageManager,
+      });
+    }
 
     const files = await fs.readdir(templatePath);
     for (const file of files) {
       const filePath = path.join(templatePath, file);
+      const targetFilePath = path.join(
+        targetPath,
+        file.startsWith(".") ? file : `${path.parse(file).name}.${extension}`
+      );
+
       const stats = await fs.stat(filePath);
 
       if (stats.isFile()) {
-        const template = await fs.readFile(filePath, "utf-8");
-        const rendered = ejs.render(template, { appName });
-        const targetFilePath = path.join(
-          targetPath,
-          `${path.parse(file).name}.${extension}`
-        );
-
-        await fs.writeFile(targetFilePath, rendered);
+        const fileName = path.basename(file);
+        if (fileName.startsWith(".env")) {
+          await fs.copyFile(filePath, targetFilePath);
+          console.log(chalk.green(`Copied ${fileName} to ${targetPath}`));
+        } else {
+          const template = await fs.readFile(filePath, "utf-8");
+          const rendered = ejs.render(template, { appName });
+          await fs.writeFile(targetFilePath, rendered);
+        }
       } else if (stats.isDirectory()) {
         const subDir = path.join(templateDir, file);
-        await generateFiles(targetPath, subDir, path.basename(file),flag);
+        await generateFiles(targetPath, subDir, path.basename(file));
       }
     }
   } catch (e) {
     console.log(chalk.red(e));
+    return exit(1);
   }
 };

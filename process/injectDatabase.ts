@@ -4,7 +4,6 @@ const main = path.join(__dirname, "../packages/generator/templates")
 
 
 export async function installMongo (){
-	
 	const tempPath=path.join(main,"Database")
 	const data = `const mongoose = require('mongoose');\n async function Mongoconnect(url) {\n try { \n  await mongoose.connect(url, { serverSelectionTimeoutMS: 5000 });  \n console.log("Connected to the MongoDB database.");\n } catch (error) {\n console.error("Error connecting to the database:", error) \n }}\n\n \n module.exports = Mongoconnect;`
 
@@ -40,11 +39,11 @@ export async function installMSQL (){
 
 // Create connection
 const connection = mysql.createConnection({
-    host: process.env.DBHOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-    port: process.env.DBPORT
+    host: process.env.HOST || "",
+    user: process.env.USER || "",
+    password: process.env.PASSWORD || "",
+    database: process.env.DATABASE || "",
+    port: process.env.DB-PORT || 3306,
 });
 
 // Connect to the database
@@ -74,7 +73,7 @@ connection.connect((err) => {
 
 `;
 
-  await fs.writeFile(path.join(modelsPath, "models.ejs"), schema, {
+  await fs.writeFile(path.join(modelsPath, "models.sql"), schema, {
     encoding: "utf-8",
   });
 }
@@ -86,11 +85,11 @@ export async function installPGSQL() {
 
 // Create a PostgreSQL client instance
 const client = new Client({
-    user: 'username',
-    host: 'localhost',
-    database: 'database_name',
-    password: 'password',
-    port: 5432, // Default PostgreSQL port
+ host: process.env.HOST || "",
+    user: process.env.USER || "",
+    password: process.env.PASSWORD || "",
+    database: process.env.DATABASE || "",
+    port: process.env.DB-PORT || 5432,
 });
 
 // Connect to the PostgreSQL database

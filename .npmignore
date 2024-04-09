@@ -1,6 +1,6 @@
 packages
-process
-test
+./process
+./test
 .*
 tsconfig.json
 yarn.lock
