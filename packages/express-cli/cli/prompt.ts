@@ -7,9 +7,10 @@ import {
   installDependencies,
   removeDependencies,
 } from "./cli.js";
-import { generateDefault } from "../../../process/readConfig.js";
+
 import { deleteFile } from "../../../process/deleteFile.js";
 import { exit } from "node:process";
+import { generateDefaultFiles } from "../../generator/main.js";
 
 export const temp = path.join(__dirname,"../../generator/templates");
 
@@ -31,14 +32,21 @@ yargs.command({
         {
           name: confirm,
           message:
-            "This will previous Configuration. Would you like to continue?",
+            "This will use previous Configuration. Would you like to continue?(default:yes)",
           type: confirm,
         },
       ]);
       if (response) {
-        await generateDefault(appName,true);
-        exit(0);
+        if (response === "no" || response === "n" || response === "N") {
+          await createExpress(appName);
+          return exit(1);
+        }else {
+          await generateDefaultFiles(process.cwd(), "templates", appName, true);
+          return exit(1);
+        }
+        
       }
+      
     }
    await createExpress(appName)
 

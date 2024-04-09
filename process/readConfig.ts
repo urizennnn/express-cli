@@ -15,19 +15,5 @@ export function readConfig (){
 }
 
 
-export async function generateDefault(name:string,flag:boolean=true){
 
-	try {
-		const details = await readConfig()
-		if (details.language === "TypeScript"){
-			await generateFiles(process.cwd(),"templates",name,flag)
-		} else {
-			await generateFiles(process.cwd(),"templates",name,flag)
-		}
-	} catch (e) {
-		console.log(chalk.red(e));
-    exit(1);
-	}
-
-}
 
