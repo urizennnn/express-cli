@@ -8,7 +8,7 @@ export function createJsonUponFreshStart(PackageManager: string, name: string) {
   }
 
   process.chdir(name);
-
+console.log(process.cwd());
   const generatePackageJson = new Promise<void>((resolve, reject) => {
     exec(`${PackageManager} init -y`, (error: Error | null) => {
       if (error) {

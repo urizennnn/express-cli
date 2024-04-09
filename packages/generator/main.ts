@@ -25,7 +25,6 @@ export const generateFiles = async (targetDir:string, templateDir:string, cdname
     let extension;
      extension = preferences.language === "TypeScript" ? "ts" : "js";
 
-	//TODO: create a separate function for this
       createJsonUponFreshStart(preferences.packageManager, targetPath);
  
 

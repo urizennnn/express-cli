@@ -49,10 +49,10 @@ export async function createExpress(name: string): Promise<void> {
     createFolderAndWriteConfig(preferences);
 
     await generateFiles(process.cwd(), "templates", name);
-	//  createJsonUponFreshStart(answer.package,path.join(process.cwd(), name));
+    // createJsonUponFreshStart(answer.package, path.join(process.cwd(), name));
     await deleteFile(path.join(temp, "Database")),
       await deleteFile(path.join(temp, "Models"));
-    process.exit(0);
+    process.exit(1);
   });
 }
 
