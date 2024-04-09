@@ -2,17 +2,22 @@ import fse from "fs-extra"
 import path from "path"
 import {generateFiles} from "../packages/generator/main"
 
-export async function generateDefault(name:string){
+export function readConfig (){
 	const homeDir = process.env.USERPROFILE || process.env.HOME as string
 	const configPath = path.join(homeDir,"@express-cli")
-    const configFile = path.join(configPath, ".express.config")
+	const configFile = path.join(configPath, ".express.config")
 
-	const details = await fse.readJson(configFile)
-	
+	return fse.readJson(configFile)
+
+}
+
+
+export async function generateDefault(name:string,flag:boolean=true){
+	const details = await readConfig()
 	if (details.language === "TypeScript"){
-		await generateFiles(process.cwd(),"templates",name)
+		await generateFiles(process.cwd(),"templates",name,flag)
 	} else {
-		await generateFiles(process.cwd(),"templates",name)
+		await generateFiles(process.cwd(),"templates",name,flag)
 	}
 
 }

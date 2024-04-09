@@ -34,7 +34,7 @@ yargs.command({
         },
       ]);
       if (response) {
-        await generateDefault(appName);
+        await generateDefault(appName,true);
         process.exit(0);
       }
     }

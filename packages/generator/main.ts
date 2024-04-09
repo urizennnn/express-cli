@@ -5,10 +5,17 @@ import chalk from "chalk";
 import { preferences } from "../config/cli.config";
 import { createJsonUponFreshStart } from "../../process/createJSON";
 import { helperInject } from "./inject";
+import { readConfig } from "../../process/readConfig";
 
-export const generateFiles = async (targetDir:string, templateDir:string, cdname:string) => {
+export const generateFiles = async (
+  targetDir: string,
+  templateDir: string,
+  cdname: string,
+  flag: boolean
+) => {
   try {
     await helperInject(preferences.database);
+    const data = await readConfig();
 
     const templatePath = path.join(__dirname, templateDir);
     const appName = cdname as string;
@@ -23,10 +30,13 @@ export const generateFiles = async (targetDir:string, templateDir:string, cdname
     await fs.ensureDir(targetPath);
 
     let extension;
-     extension = preferences.language === "TypeScript" ? "ts" : "js";
+    extension = preferences.language === "TypeScript" ? "ts" : "js";
 
-      createJsonUponFreshStart(preferences.packageManager, targetPath);
- 
+    if (flag) {
+      createJsonUponFreshStart(targetPath,data.packageManager);
+    } 
+      createJsonUponFreshStart(targetPath, preferences.packageManager);
+    
 
     const files = await fs.readdir(templatePath);
     for (const file of files) {
@@ -44,7 +54,7 @@ export const generateFiles = async (targetDir:string, templateDir:string, cdname
         await fs.writeFile(targetFilePath, rendered);
       } else if (stats.isDirectory()) {
         const subDir = path.join(templateDir, file);
-        await generateFiles(targetPath, subDir, path.basename(file));
+        await generateFiles(targetPath, subDir, path.basename(file),flag);
       }
     }
   } catch (e) {

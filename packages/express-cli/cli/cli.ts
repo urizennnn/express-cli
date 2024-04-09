@@ -6,7 +6,7 @@ import chalk from "chalk";
 import { deleteFile } from "../../../process/deleteFile.js";
 import path from "path";
 import { temp } from "./prompt.js";
-import { createJsonUponFreshStart } from "../../../process/createJSON.js";
+
 
 export async function createExpress(name: string): Promise<void> {
   const question = [
@@ -48,7 +48,7 @@ export async function createExpress(name: string): Promise<void> {
 
     createFolderAndWriteConfig(preferences);
 
-    await generateFiles(process.cwd(), "templates", name);
+    await generateFiles(process.cwd(), "templates", name,false);
     // createJsonUponFreshStart(answer.package, path.join(process.cwd(), name));
     await deleteFile(path.join(temp, "Database")),
       await deleteFile(path.join(temp, "Models"));
