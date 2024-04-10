@@ -1,6 +1,6 @@
 {
   "name": "@urizen/express-cli",
-  "version": "0.0.4",
+  "version": "1.0.1",
   "license": "MIT",
   "dependencies": {
     "@types/ejs": "^3.1.5",
@@ -17,7 +17,7 @@
     "yargs": "^17.7.2"
   },
   "bin": {
-    "cli": "./dist/packages/express-cli/cli/prompt.js"
+    "cli": "dist/packages/express-cli/cli/prompt.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -45,5 +45,8 @@
   "bugs": {
     "url": "https://github.com/urizennnn/express-cli/issues"
   },
-  "homepage": "https://github.com/urizennnn/express-cli#readme"
+  "homepage": "https://github.com/urizennnn/express-cli#readme",
+  "keywords": [
+    "cli"
+  ]
 }

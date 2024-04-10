@@ -6,3 +6,4 @@ tsconfig.json
 yarn.lock
 *.bat
 node_modules
+./dist/packages/generators/templates
