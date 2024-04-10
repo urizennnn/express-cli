@@ -4,15 +4,17 @@
  For now are in development phase and you can only run script with the folder not outside the folder .
 
  # INSTALLATION FOR WINDOWS 
+
+ ## Steps
+ First run `npm i` then `npm run build` to build the file, then copy the templates folder which can be found in `packages/generator/` and paste it in `dist/packages/generator/`.
 Copy the file path in which the repo has been cloned and add it to your environment variable 
 
 ## Commands
   ```
-urizen create <app-name>
+urizen create <app-name> [flag] --y (optional, for no interaction)
       or
-urizen new <app-name>
+urizen new <app-name> --y (optional, for no interaction)
 ```
-right now you'll just be asked question this is just to make sure while in development we do not have any OS based bugs no fuctionality is really added at the moment.
 
 you can run 
 ```

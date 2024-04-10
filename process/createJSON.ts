@@ -1,49 +1,58 @@
 import chalk from "chalk";
 import { exec } from "child_process";
+import { readConfig } from "./readConfig";
+import { exit } from "node:process";
 
-export function createJsonUponFreshStart(PackageManager: string, name: string) {
-  if (!PackageManager) {
-    console.log(chalk.red("Error retrieving PackageManager"));
-    process.exit(1);
-  }
+export async function createJsonUponFreshStart({
+  name,
+  PackageManager,
+}: {
+  name: string;
+  PackageManager?: string;
+}) {
+  try {
+    const details = await readConfig();
+    PackageManager = PackageManager || details.packageManager;
 
-  process.chdir(name);
+    if (!PackageManager) {
+      console.log(chalk.red("Error retrieving PackageManager"));
+      exit(1);
+    }
 
-  const generatePackageJson = new Promise<void>((resolve, reject) => {
-    exec(`${PackageManager} init -y`, (error: Error | null) => {
-      if (error) {
-        console.error(`Error generating package.json: ${error}`);
-        reject(error);
-      } else {
-        console.log(
-          `Successfully generated package.json using ${PackageManager}`
-        );
-        resolve();
-      }
-    });
-  });
-
-  const installExpress = new Promise<void>((resolve, reject) => {
-    exec(`${PackageManager} install express`, (error: Error | null) => {
-      if (error) {
-        console.error(chalk.red(`Error installing express: ${error}`));
-        reject(error);
-      } else {
-        console.log(chalk.red(`Successfully installed express using ${PackageManager}`));
-        resolve();
-      }
-    });
-  });
-
-
-  generatePackageJson
-    .then(() => {
-      return installExpress;
-    })
-    .catch((error) => {
-      console.error(
-        chalk.red(`Error during package.json generation or express installation: ${error}`)
+    const generatePackageJson = new Promise<void>((resolve, reject) => {
+      exec(
+        `${PackageManager} init -y`,
+        { cwd: name },
+        (error: Error | null) => {
+          if (error) {
+            console.error(`Error generating package.json: ${error}`);
+            reject(error);
+          } else {
+            resolve();
+          }
+        }
       );
-      process.exit(1);
     });
+
+    const installExpress = new Promise<void>((resolve, reject) => {
+      exec(
+        `${PackageManager} install express`,
+        { cwd: name },
+        (error: Error | null) => {
+          if (error) {
+            console.error(chalk.red(`Error installing express: ${error}`));
+            reject(error);
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+
+    await generatePackageJson;
+    await installExpress;
+  } catch (e) {
+    console.log(chalk.red(e));
+    exit(1);
+  }
 }

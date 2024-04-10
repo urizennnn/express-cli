@@ -2,50 +2,151 @@ import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
-import {preferences} from "../config/cli.config";
+import { preferences } from "../config/cli.config";
 import { createJsonUponFreshStart } from "../../process/createJSON";
+import { helperInject } from "./inject";
+import { readConfig } from "../../process/readConfig";
+import { injectEnv } from "../../process/injectEnv";
+import { exit } from "node:process";
 
-export const generateFiles = async (targetDir:string, templateDir:string,cdname?:string) => {
-	try{
-		const templatePath = path.join(__dirname, templateDir);
-		let appName = cdname as string
-		const targetPath = path.join(targetDir, appName);
-		const pathExist = await fs.pathExists(targetPath);
-		if (pathExist){
-			console.log(chalk.red(`Folder ${appName} already exists`))
-			process.exit(1)
-		}
-		await fs.ensureDir(targetPath);
-		let extension;
-	if (preferences.language === "TypeScript"){
-		extension = "ts"
-	}else {
-		extension = "js"
-	}
-	if (preferences.injection === "fresh start") {
-		createJsonUponFreshStart(preferences.packageManager,targetPath);
-	}
-		const files = await fs.readdir(templatePath);
-		for (const file of files) {
-			const filePath = path.join(templatePath, file);
-			const stats = await fs.stat(filePath);
+export const generateFiles = async (
+  targetDir: string,
+  templateDir: string,
+  cdname: string,
+  flag: boolean = false,
+) => {
+  try {
 
-			if (stats.isFile()) {
-				const template = await fs.readFile(filePath, "utf-8");
-				const rendered = ejs.render(template, { appName });
-				const targetFilePath = path.join(
-					targetPath,
-					`${path.parse(file).name}.${extension}`
-				);
+    const database =  preferences.database;
+    await helperInject(database);
+    await injectEnv(database);
 
-				await fs.writeFile(targetFilePath, rendered);
+    const templatePath = path.join(__dirname, templateDir);
+    const appName = cdname as string;
+    const targetPath = path.join(targetDir, appName);
+    const pathExist = await fs.pathExists(targetPath);
+
+    if (pathExist) {
+      console.log(chalk.red(`Folder ${appName} already exists`));
+      return exit(0);
+    }
+
+    await fs.ensureDir(targetPath);
+ const extension =
+   preferences.language === "TypeScript"
+     ? (() => {
+         throw new Error(`Sorry ${preferences.language} support coming soon.`);
+       })()
+     : "js";
 
 
-			}  else if (stats.isDirectory()) {
-				const subDir = path.join(templateDir, file);
-				await generateFiles(targetPath, subDir,path.basename(file));
-			}
-		}
-	}catch (e:any){
-		console.log(chalk.red(e))
-	}};
+    if (flag) {
+      await createJsonUponFreshStart({
+        name: targetPath,
+        PackageManager:preferences.packageManager,
+      });
+    }
+
+    const files = await fs.readdir(templatePath);
+    for (const file of files) {
+      const filePath = path.join(templatePath, file);
+      const targetFilePath = path.join(
+        targetPath,
+        file.startsWith(".") ? file : `${path.parse(file).name}.${extension}`
+      );
+
+      const stats = await fs.stat(filePath);
+
+      if (stats.isFile()) {
+        const fileName = path.basename(file);
+        if (fileName.startsWith(".env")) {
+          await fs.copyFile(filePath, targetFilePath);
+          console.log(chalk.green(`Copied ${fileName} to ${targetPath}`));
+        } else {
+          const template = await fs.readFile(filePath, "utf-8");
+          const rendered = ejs.render(template, { appName });
+          await fs.writeFile(targetFilePath, rendered);
+        }
+      } else if (stats.isDirectory()) {
+        const subDir = path.join(templateDir, file);
+        await generateFiles(targetPath, subDir, path.basename(file));
+      }
+    }
+  } catch (e:any) {
+    console.log(chalk.red(e.stack));
+    return exit(1);
+  }
+};
+export const generateDefaultFiles = async (
+  targetDir: string,
+  templateDir: string,
+  cdname: string,
+  flag: boolean = false
+) => {
+  try {
+    const data = await readConfig();
+
+    if (!data || !data.database) {
+      throw new Error("Database configuration not found.");
+    }
+
+    const database: string = data.database;
+    await helperInject(database);
+    await injectEnv(database);
+
+    const templatePath = path.join(__dirname, templateDir);
+    const appName = cdname as string;
+    const targetPath = path.join(targetDir, appName);
+    const pathExist = await fs.pathExists(targetPath);
+
+    if (pathExist) {
+      console.log(chalk.red(`Folder ${appName} already exists`));
+      return exit(0);
+    }
+
+    await fs.ensureDir(targetPath);
+    let extension;
+    extension = data.language === "TypeScript" ? "ts" : "js";
+
+   
+    if (flag) {
+      await createJsonUponFreshStart({
+        name: targetPath,
+        PackageManager: data.packageManager || preferences.packageManager,
+      });
+    }
+
+
+    const files = await fs.readdir(templatePath);
+    for (const file of files) {
+      const filePath = path.join(templatePath, file);
+      if (file.startsWith('.git')){
+        continue
+      }
+    const targetFilePath = path.join(
+        targetPath,
+        file.startsWith(".") ? file : `${path.parse(file).name}.${extension}`
+      );
+
+      const stats = await fs.stat(filePath);
+
+      if (stats.isFile()) {
+        const fileName = path.basename(file);
+        if (fileName.startsWith(".env")) {
+          await fs.copyFile(filePath, targetFilePath);
+          console.log(chalk.green(`Copied ${fileName} to ${targetPath}`));
+        } else {
+          const template = await fs.readFile(filePath, "utf-8");
+          const rendered = ejs.render(template, { appName });
+          await fs.writeFile(targetFilePath, rendered);
+        }
+      } else if (stats.isDirectory()) {
+        const subDir = path.join(templateDir, file);
+        await generateDefaultFiles(targetPath, subDir, path.basename(file));
+      }
+    }
+  } catch (e:any) {
+    console.log(chalk.red(e.stack));
+    return exit(1);
+  }
+};

@@ -3,96 +3,104 @@ import { prompt, loadingBar, preferences } from "../../config/cli.config.js";
 import { exec } from "child_process";
 import { createFolderAndWriteConfig } from "./helper.js";
 import chalk from "chalk";
-
+import { deleteFile } from "../../../process/deleteFile.js";
+import path from "path";
+import { temp } from "./prompt.js";
+import { exit } from "node:process";
+import { createJsonUponFreshStart } from "../../../process/createJSON.js";
 
 export async function createExpress(name: string): Promise<void> {
-	const question = [
-		{
-			type: "list",
-			name: "package",
-			message: "Choose package manager?",
-			choices: ["npm", "yarn", "pnpm"],
-			default: "npm",
-		},
-		{
-			type: "list",
-			name: "language",
-			message: "Choose language?",
-			choices: ["JavaScript", "TypeScript"],
-			default: "JavaScript",
-		},
-		{
-			type: "list",
-			name: "database",
-			message: "What database are you using?",
-			choices: ["MongoDB", "MSQL", "PGSQL", "Other"],
-		},
-		{
-			type: "list",
-			name: "dependency",
-			message: "Would you like to add pre installed dependencies or a fresh start?",
-			choices: ["pre installed", "fresh start"],
-			default: "pre installed",
-		},
-	];
+  try {
+    const question = [
+      {
+        type: "list",
+        name: "package",
+        message: "Choose package manager?",
+        choices: ["npm", "yarn", "pnpm"],
+        default: "npm",
+      },
+      {
+        type: "list",
+        name: "language",
+        message: "Choose language?",
+        choices: ["JavaScript", "TypeScript"],
+        default: "JavaScript",
+      },
+      {
+        type: "list",
+        name: "database",
+        message: "What database are you using?",
+        choices: ["MongoDB", "MSQL", "PGSQL", "Other"],
+      },
+      {
+        type: "list",
+        name: "dependency",
+        message:
+          "Would you like to add pre installed dependencies or a fresh start?",
+        choices: ["pre installed", "fresh start"],
+        default: "pre installed",
+      },
+    ];
 
-	prompt(question).then(async (answer) => {
-		preferences.language = answer.language;
-		preferences.database = answer.database;
-		preferences.injection = answer.dependency;
-		preferences.packageManager = answer.package;
+    prompt(question).then(async (answer) => {
+      preferences.language = answer.language;
+      preferences.database = answer.database;
+      preferences.injection = answer.dependency;
+      preferences.packageManager = answer.package;
 
-		createFolderAndWriteConfig(preferences);
-		if (answer.dependency === "fresh start"){
-			await generateFiles(process.cwd(),"templates",name)
-			
-		}
-
-
-		process.exit(0);
-	});
+      createFolderAndWriteConfig(preferences);
+      await Promise.all([
+        generateFiles(process.cwd(), "templates", name, true),
+        await deleteFile(path.join(temp, "Database")),
+        await deleteFile(path.join(temp, "Models"))
+      ]);
+    });
+  } catch (e) {
+    console.log(chalk.red(e));
+    exit(1);
+  }
 }
 
 export async function installDependencies(...args: string[]): Promise<void> {
-	const argv: string = args.join(" ");
+  const argv: string = args.join(" ");
 
-	console.log(chalk.green(`Installing ${argv}...`));
-	const interval = loadingBar("Installing");
+  console.log(chalk.green(`Installing ${argv}...`));
+  const interval = loadingBar("Installing");
 
-	const packageManager: string = preferences.packageManager || "npm";
+  const packageManager: string = preferences.packageManager || "npm";
 
-	exec(`${packageManager} install ${argv}`, (error: Error | null, ) => {
-		clearInterval(interval);
-		process.stdout.clearLine(0);
-		process.stdout.cursorTo(0);
-		process.stdout.write("\nInstalled [.........]");
+  exec(`${packageManager} install ${argv}`, (error: Error | null) => {
+    clearInterval(interval);
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write("\nInstalled [.........]");
 
-		if (error) {
-			console.error(`${packageManager} install error: ${error.message}`);
-			return;
-		}
+    if (error) {
+      console.error(`${packageManager} install error: ${error.message}`);
+      return;
+    }
 
-		console.log(chalk.green(`\nSuccessfully installed ${argv}.`));
-	});
+    console.log(chalk.green(`\nSuccessfully installed ${argv}.`));
+  });
 }
 
 export async function removeDependencies(...args: string[]): Promise<void> {
-	const argv: string = args.join(" ");
+  const argv: string = args.join(" ");
 
-	console.log(chalk.green(`Removing ${argv}...`));
-	const interval = loadingBar("Removing");
+  console.log(chalk.green(`Removing ${argv}...`));
+  const interval = loadingBar("Removing");
 
-	exec(`npm remove ${argv}`, (error: Error | null, ) => {
-		clearInterval(interval);
-		process.stdout.clearLine(0);
-		process.stdout.cursorTo(0);
-		process.stdout.write("\nRemoved [.........]");
+  exec(`npm remove ${argv}`, (error: Error | null) => {
+    clearInterval(interval);
+    process.stdout.clearLine(0);
+    process.stdout.cursorTo(0);
+    process.stdout.write("\nRemoved [.........]");
 
-		if (error) {
-			console.error(`npm remove error: ${error.message}`);
-			return;
-		}
+    if (error) {
+      console.error(`npm remove error: ${error.message}`);
+      return;
+    }
 
-		console.log(chalk.green(`\nSuccessfully removed ${argv}.`));
-	});
+    console.log(chalk.green(`\nSuccessfully removed ${argv}.`));
+  });
 }
