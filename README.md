@@ -1,33 +1,21 @@
-# Express cli tool in progress
+# First Release 
+This is the first release of the express-cli npm package aimed at making/developing in express faster rather than having to create all folders from scratch.
 
-## Aimed at making express applications faster and seamlesss
- For now are in development phase and you can only run script with the folder not outside the folder .
+# Notes
+At the moment express-cli only supports JavaScript code generation, (only Js code are generated). In the nearest future TypeScript generation would be supported along side the tsconfig.json already initiated into the project directory. 
 
- # INSTALLATION FOR WINDOWS 
+# Usage
+## Installation 
+First install the npm package with `npm i -g ```@urizen/express-clli``` 
 
- ## Steps
- First run `npm i` then `npm run build` to build the file, then copy the templates folder which can be found in `packages/generator/` and paste it in `dist/packages/generator/`.
-Copy the file path in which the repo has been cloned and add it to your environment variable 
+To initialize an express application run 
+` cli new <folderName> [flag] --y(optional)
+          or
+cli create <folderName>  [flag] --y(optional)
+`
+Using the flag skips the prompting steps and directly scaffolds a new app based on your last usage.
 
-## Commands
-  ```
-urizen create <app-name> [flag] --y (optional, for no interaction)
-      or
-urizen new <app-name> --y (optional, for no interaction)
-```
-
-you can run 
-```
- urizen install <package-name>
-         or
-urizen i <package-name>
-```
-Keep in mind that which ever package manager you chose in the first command will be stored and all commands will be used with that package manager and it's flags to are supported like ``` -D  will work and it is the same as -d```
-for example 
-  ```
-urizen install <package-name>
-```
-won't work if you chose yarn as your package manager and so on.
+An alternative to `npm i <packageName> `, you can also use ` cli i <packageName>` This takes in all the flags as the regular npm installation 
 
 
-you can also run the remove command or it's alias   ``` ui or uninstall ``` 
+Like wise you can also run `cli ui<packagename> or cli uninstall <packageName> `
