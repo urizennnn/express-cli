@@ -18,7 +18,7 @@ export async function injectEnv(db:string) {
           `;
       const envFilePath = path.join(tempPath, ".env");
       await fs.writeFile(envFilePath, env);
-    } else if (db === "MySQL") {
+    } else if (db === "MSQL") {
       const env = `
   MYSQL_HOST=your_mysql_host
   MYSQL_USER=your_mysql_user

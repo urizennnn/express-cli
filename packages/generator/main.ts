@@ -16,11 +16,8 @@ export const generateFiles = async (
   flag: boolean = false,
 ) => {
   try {
-    let data;
-    if (flag) {
-      data = await readConfig();
-    }
-    const database = data.database || preferences.database;
+
+    const database =  preferences.database;
     await helperInject(database);
     await injectEnv(database);
 
@@ -35,13 +32,18 @@ export const generateFiles = async (
     }
 
     await fs.ensureDir(targetPath);
-    let extension;
-    extension = preferences.language || data.language  === "TypeScript" ? "ts" : "js";
+ const extension =
+   preferences.language === "TypeScript"
+     ? (() => {
+         throw new Error(`Sorry ${preferences.language} support coming soon.`);
+       })()
+     : "js";
+
 
     if (flag) {
       await createJsonUponFreshStart({
         name: targetPath,
-        PackageManager: data.packageManager || preferences.packageManager,
+        PackageManager:preferences.packageManager,
       });
     }
 

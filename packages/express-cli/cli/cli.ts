@@ -52,7 +52,7 @@ export async function createExpress(name: string): Promise<void> {
       await Promise.all([
         generateFiles(process.cwd(), "templates", name, true),
         await deleteFile(path.join(temp, "Database")),
-        await deleteFile(path.join(temp, "Models")),
+        await deleteFile(path.join(temp, "Models"))
       ]);
     });
   } catch (e) {
