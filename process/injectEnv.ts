@@ -1,47 +1,56 @@
 import path from "path";
 import fs from "fs-extra";
 import chalk from "chalk";
-import {exit} from"node:process"
+import { exit } from "node:process";
 
-
-export async function injectEnv(db:string) {
+export async function injectEnv(db: string) {
   try {
-    
     const tempPath: string = path.join(
       __dirname,
       "../packages/generator/templates"
     );
-  
+
     if (db === "MongoDB") {
       const env = `
   MONGO_URI=your_mongo_uri
+  JWT_SECRET=your_jwt_secret
+  JWT_LIMIT=30d 
           `;
       const envFilePath = path.join(tempPath, ".env");
       await fs.writeFile(envFilePath, env);
     } else if (db === "MSQL") {
       const env = `
-  MYSQL_HOST=your_mysql_host
-  MYSQL_USER=your_mysql_user
-  MYSQL_PASSWORD=your_mysql_password
-  MYSQL_DATABASE=your_mysql_database
+  MYSQL_HOST=localhost
+  MYSQL_USER=root
+  MYSQL_PASSWORD=
+  MYSQL_DATABASE=database
+  JWT_SECRET=your_jwt_secret
+  JWT_LIMIT=30d 
           `;
       const envFilePath = path.join(tempPath, ".env");
       await fs.writeFile(envFilePath, env);
     } else if (db === "PGSQL") {
       const env = `
-  PGSQL_HOST=your_pgsql_host
-  PGSQL_USER=your_pgsql_user
-  PGSQL_PASSWORD=your_pgsql_password
-  PGSQL_DATABASE=your_pgsql_database
+  PGSQL_HOST=localhost
+  PGSQL_USER=root
+  PGSQL_PASSWORD=
+  PGSQL_DATABASE=database
+  JWT_SECRET=your_jwt_secret
+  JWT_LIMIT=30d 
           `;
       const envFilePath = path.join(tempPath, ".env");
       await fs.writeFile(envFilePath, env);
     } else {
-      console.error("Unsupported database type");
+      const env = `
+  DATABASE_URI=your_database_uri
+  JWT_SECRET=your_jwt_secret
+  JWT_LIMIT=30d 
+          `;
+      const envFilePath = path.join(tempPath, ".env");
+      await fs.writeFile(envFilePath, env);
     }
   } catch (e) {
-    console.log(chalk.red(e))
-    exit(1)
+    console.log(chalk.red(e));
+    exit(1);
   }
 }
-
