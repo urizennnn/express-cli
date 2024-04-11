@@ -106,7 +106,7 @@ client.connect()
     });
 `;
 
-  await fs.writeFile(path.join(tempPath, "pgsql.ejs"), data, {
+  await fs.writeFile(path.join(tempPath, "pgsql.sql"), data, {
     encoding: "utf-8",
   });
 

@@ -1,6 +1,6 @@
 {
   "name": "@urizen/express-cli",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "license": "MIT",
   "dependencies": {
     "@types/ejs": "^3.1.5",
@@ -28,7 +28,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   },
-  "description": "For now are in development phase and you can only run script with the folder not outside the folder .",
+  "description": "",
   "main": "./packages/express-cli/cli/prompt.js",
   "directories": {
     "test": "test"
@@ -45,7 +45,7 @@
   "bugs": {
     "url": "https://github.com/urizennnn/express-cli/issues"
   },
-  "homepage": "https://github.com/urizennnn/express-cli#readme",
+  "homepage": "",
   "keywords": [
     "cli"
   ]

@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 import { hideBin } from "yargs/helpers";
-import path from "node:path";
 import minimist from "minimist";
 import inquirer from "inquirer";
 
 export interface User {
-  packageManager: string;
-  language: string;
-  injection: string;
-  database: string;
+  packageManager: undefined | string;
+  language: undefined | string;
+  injection: undefined | string;
+  database: undefined | string;
 }
 
 export const args = hideBin(process.argv);
@@ -30,12 +29,32 @@ export function loadingBar(command:string) {
   }, 100);
   return loadingInterval;
 }
+export function loadingBarPromise(command: string): Promise<void> {
+  const totalTicks = 10;
+  let ticks = 0;
+
+  return new Promise((resolve) => {
+    const loadingInterval = setInterval(() => {
+      ticks++;
+      const progress = ".".repeat(ticks) + " ".repeat(totalTicks - ticks);
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write(`${command} [${progress}]`);
+      
+      if (ticks >= totalTicks) {
+        clearInterval(loadingInterval);
+        process.stdout.write('\n'); 
+        resolve();
+      }
+    }, 100);
+  });
+};
 
 export let preferences :User= {
-  packageManager: "",
-  language: "",
-  injection: "",
-  database: "",
+  packageManager: undefined,
+  language: undefined,
+  injection: undefined,
+  database: undefined,
 };
 
 export const dependencies = [
@@ -56,6 +75,5 @@ export const devDependencies = [
   "chai",
   "prettier",
 ];
-
 
 

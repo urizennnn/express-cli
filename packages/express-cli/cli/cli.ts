@@ -7,7 +7,7 @@ import { deleteFile } from "../../../process/deleteFile.js";
 import path from "path";
 import { temp } from "./prompt.js";
 import { exit } from "node:process";
-import { createJsonUponFreshStart } from "../../../process/createJSON.js";
+
 
 export async function createExpress(name: string): Promise<void> {
   try {
@@ -43,6 +43,7 @@ export async function createExpress(name: string): Promise<void> {
     ];
 
     prompt(question).then(async (answer) => {
+
       preferences.language = answer.language;
       preferences.database = answer.database;
       preferences.injection = answer.dependency;
@@ -50,9 +51,10 @@ export async function createExpress(name: string): Promise<void> {
 
       createFolderAndWriteConfig(preferences);
       await Promise.all([
-        generateFiles(process.cwd(), "templates", name, true),
-        await deleteFile(path.join(temp, "Database")),
-        await deleteFile(path.join(temp, "Models"))
+       generateFiles(process.cwd(), "templates", name, true),
+        deleteFile(path.join(temp, "Database")),
+        deleteFile(path.join(temp, "Models")),
+       
       ]);
     });
   } catch (e) {

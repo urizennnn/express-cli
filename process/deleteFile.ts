@@ -14,3 +14,9 @@ export const deleteFile = async (filePath: string) => {
         console.error(chalk.red(`Error deleting files: ${err}`));
     }
 };
+export const deleteFolder = async (folderPath: string) => {
+    try {
+        await fs.remove(folderPath);
+    } catch (err) {
+        console.error(chalk.red(`Error deleting folder: ${err}`));
+    } }

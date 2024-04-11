@@ -23,4 +23,5 @@ Like wise you can also run `cli ui<packagename> or cli uninstall <packageName> `
 
 # Testing 
 For pre-release testing of features clone the repo annd edit the urizen.bat file and remove C/Users/Victor/Desktop and place in yours.
+
 Then build the package with the npm run build commands and add the folder path to you systems variable e.g C/Users/Victor/Desktop/express-cli and then run all the commands as normal but instead of cli as keyword use urizen as keyword
