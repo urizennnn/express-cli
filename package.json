@@ -47,6 +47,6 @@
   },
   "homepage": "",
   "keywords": [
-    "cli"
+    "cli","express"
   ]
 }
