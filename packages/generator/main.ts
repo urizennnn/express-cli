@@ -24,6 +24,7 @@ export const generateFiles = async (
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
 
 export const generateDefaultFiles = async (
@@ -43,6 +44,7 @@ export const generateDefaultFiles = async (
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
 
 async function generate(
@@ -52,25 +54,24 @@ async function generate(
   flag: boolean,
   data?: any
 ) {
-
   const database = data ? data.database : preferences.database;
+  const language = (data?.language ?? preferences.language).toLowerCase();
 
- 
-  if ((data && data.language) || preferences.language === "TypeScript") {
+  if (language === "typescript") {
     await helperInjectTS(database);
-  } else if ((data && data.language) || preferences.language === "JavaScript") {
+  } else if (language === "javascript") {
     await helperInject(database);
   }
+
   await injectEnv(database);
 
   const templatePath = path.join(__dirname, templateDir);
   const appName = cdname as string;
   const targetPath = path.join(targetDir, appName);
 
-  
   if (await fs.pathExists(targetPath)) {
     console.log(chalk.red(`Folder ${appName} already exists`));
-    process.exit(0);
+    process.exit(1);
   }
 
   await fs.ensureDir(targetPath);
@@ -95,11 +96,11 @@ async function generate(
   }
 
   const files = await fs.readdir(templatePath);
-
   for (const file of files) {
     if (file.startsWith(".git")) {
       continue;
     }
+    if (path.extname(file) === "sql") continue;
 
     const filePath = path.join(templatePath, file);
     const targetFilePath = path.join(
@@ -123,8 +124,8 @@ async function generate(
       await generate(targetPath, subDir, path.basename(file), false, data);
     }
   }
-
+  let isTs: boolean = language === "typescript" ? true : false;
   if (preferences.injection || data?.injection === "pre installed") {
-    await injectDb(targetPath, database);
+    await injectDb(targetPath, database, isTs);
   }
 }

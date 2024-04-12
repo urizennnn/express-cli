@@ -5,7 +5,11 @@ import {
 } from "../../process/injectDatabase";
 import chalk from "chalk";
 import { exit } from "node:process";
-import { installTSMSQL, installTSMongo, installTSPGSQL } from "../../process/TS/injectTSDatabse";
+import {
+  installTSMSQL,
+  installTSMongo,
+  installTSPGSQL,
+} from "../../process/TS/injectTSDatabse";
 
 export async function helperInject(database: string) {
   try {
@@ -30,7 +34,7 @@ export async function helperInjectTS(database: string) {
     } else if (database === "PGSQL") {
       await installTSPGSQL();
     }
-  } catch (e:any) {
+  } catch (e: any) {
     console.log(chalk.red(e.stack));
     exit(1);
   }
