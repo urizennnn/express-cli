@@ -42,6 +42,7 @@ export async function createExpress(name: string): Promise<void> {
     ];
 
     prompt(question).then(async (answer) => {
+      loadingBar("Creating your express app...");
       preferences.language = answer.language;
       preferences.database = answer.database;
       preferences.injection = answer.dependency;

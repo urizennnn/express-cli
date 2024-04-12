@@ -4,6 +4,7 @@ import {
   devDependencies,
   devDependenciesWithTypes,
   preferences,
+  dependenciesWithTypes
 } from "../packages/config/cli.config";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -11,45 +12,61 @@ import { readConfig } from "./readConfig";
 
 const asyncExec = promisify(exec);
 
+
+
+
+
 export async function injectDefault(name: string,flag:boolean) {
   console.log(chalk.green("Installing dependencies..."))
   let command = "";
+
   const data = await readConfig();
-  if (
-    preferences.packageManager ||
-    data.packageManager === "npm" ||
-    preferences.packageManager ||
-    data.packageManager === "pnpm"
-  ) {
-    command = "install";
-  } else if (preferences.packageManager || data.packageManager === "yarn") {
-    command = "add";
-  }
-  let manager: string;
-  if (preferences.packageManager === undefined) {
-    manager = data.packageManager;
-  } else {
-    manager = preferences.packageManager;
-  }
-  for (const dev of dependencies) {
-    try {
-      await asyncExec(`${manager} ${command} ${dev} `, {
-        cwd: name,
-        windowsHide: true,
-      });
-    } catch (err: any) {
-      console.error(chalk.red(err.message));
+  const manager = preferences.packageManager || data?.packageManager;
+  const command = getPackageManagerCommand(manager);
+
+  try {
+    await installDependencies(name, manager, command, dependencies);
+    await installDependencies(name, manager, command, devDependencies, "-D");
+
+    if (flag) {
+      await installDependencies(
+        name,
+        manager,
+        command,
+        devDependenciesWithTypes,
+        "-D"
+      );
+      await installDependencies(name, manager, command, dependenciesWithTypes);
     }
+  } catch (error: any) {
+    console.error(chalk.red(error.message));
   }
-  for (const dev of devDependencies) {
-    try {
-      await asyncExec(`${manager} ${command} -D ${dev} `, {
-        cwd: name,
-        windowsHide: true,
-      });
-    } catch (err: any) {
-      console.error(chalk.red(err.message));
-    }
+}
+
+async function installDependencies(
+  name: string,
+  manager: string,
+  command: string,
+  dependenciesList: string[],
+  flag: string = ""
+) {
+  for (const dependency of dependenciesList) {
+    await asyncExec(`${manager} ${command} ${flag} ${dependency}`, {
+      cwd: name,
+      windowsHide: true,
+    });
+  }
+}
+
+function getPackageManagerCommand(manager: string | undefined): string {
+  switch (manager) {
+    case "npm":
+    case "pnpm":
+      return "install";
+    case "yarn":
+      return "add";
+    default:
+      throw new Error("Unsupported package manager");
   }
   if (flag){
     for (const dev of devDependenciesWithTypes) {
@@ -66,6 +83,7 @@ export async function injectDefault(name: string,flag:boolean) {
   }
 }
 
+
 export const injectDb = async (targetPath: string, database: string,flag:boolean = false) => {
   if (database === "MongoDB") {
     dependencies.push("mongoose");
@@ -78,5 +96,6 @@ export const injectDb = async (targetPath: string, database: string,flag:boolean
     await injectDefault(targetPath,flag);
   } else if (database === "Other") {
     await injectDefault(targetPath,flag);
+
   }
 };

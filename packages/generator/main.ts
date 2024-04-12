@@ -47,6 +47,8 @@ export const generateDefaultFiles = async (
   process.exit(0); // Exit after the generate function completes successfully
 };
 
+
+
 async function generate(
   targetDir: string,
   templateDir: string,
@@ -82,10 +84,8 @@ async function generate(
       ? "ts"
       : "js";
 
-  if (extension === "ts") {
-    if (flag) {
-      await initTs(targetPath);
-    }
+  if (extension === "ts" && flag) {
+    await initTs(targetPath);
   }
 
   if (flag) {
@@ -114,6 +114,9 @@ async function generate(
       const fileName = path.basename(file);
       if (fileName.startsWith(".env")) {
         await fs.copyFile(filePath, targetFilePath);
+      } else if (/\.sql$/i.test(fileName)) {
+        // Only copy files with .sql extension
+        await fs.copyFile(filePath, path.join(targetPath, fileName));
       } else {
         const template = await fs.readFile(filePath, "utf-8");
         const rendered = ejs.render(template, { appName });
@@ -124,7 +127,11 @@ async function generate(
       await generate(targetPath, subDir, path.basename(file), false, data);
     }
   }
+
+
+
   let isTs: boolean = language === "typescript" ? true : false;
+
   if (preferences.injection || data?.injection === "pre installed") {
     await injectDb(targetPath, database, isTs);
   }
