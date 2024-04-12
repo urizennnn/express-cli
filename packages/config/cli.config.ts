@@ -48,8 +48,7 @@ export function loadingBarPromise(command: string): Promise<void> {
   });
 }
 
-
-export let preferences :User= {
+export let preferences: User = {
   packageManager: undefined,
   language: undefined,
   injection: undefined,
@@ -64,7 +63,7 @@ export const dependencies = [
   "helmet",
   "morgan",
   "http-status-codes",
-  "dotenv"
+  "dotenv",
 ];
 
 export const devDependencies = [
@@ -75,4 +74,19 @@ export const devDependencies = [
   "prettier",
 ];
 
-
+export const dependenciesWithTypes = [
+  "@types/express",
+  "@types/cookie-parser",
+  "@types/cors",
+  "@types/express-session",
+  "@types/helmet",
+  "@types/morgan",
+  "@types/http-status-codes",
+  "@types/dotenv",
+];
+export const devDependenciesWithTypes = [
+  "@types/nodemon",
+  "@types/eslint",
+  "@types/mocha",
+  "@types/chai",
+];

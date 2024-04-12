@@ -24,6 +24,7 @@ export const generateFiles = async (
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
 
 export const generateDefaultFiles = async (
@@ -43,7 +44,10 @@ export const generateDefaultFiles = async (
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
+
+
 
 async function generate(
   targetDir: string,
@@ -52,25 +56,24 @@ async function generate(
   flag: boolean,
   data?: any
 ) {
-
   const database = data ? data.database : preferences.database;
+  const language = (data?.language ?? preferences.language).toLowerCase();
 
- 
-  if ((data && data.language) || preferences.language === "TypeScript") {
+  if (language === "typescript") {
     await helperInjectTS(database);
-  } else if ((data && data.language) || preferences.language === "JavaScript") {
+  } else if (language === "javascript") {
     await helperInject(database);
   }
+
   await injectEnv(database);
 
   const templatePath = path.join(__dirname, templateDir);
   const appName = cdname as string;
   const targetPath = path.join(targetDir, appName);
 
-  
   if (await fs.pathExists(targetPath)) {
     console.log(chalk.red(`Folder ${appName} already exists`));
-    process.exit(0);
+    process.exit(1);
   }
 
   await fs.ensureDir(targetPath);
@@ -81,10 +84,8 @@ async function generate(
       ? "ts"
       : "js";
 
-  if (extension === "ts") {
-    if (flag) {
-      await initTs(targetPath);
-    }
+  if (extension === "ts" && flag) {
+    await initTs(targetPath);
   }
 
   if (flag) {
@@ -113,6 +114,9 @@ async function generate(
       const fileName = path.basename(file);
       if (fileName.startsWith(".env")) {
         await fs.copyFile(filePath, targetFilePath);
+      } else if (/\.sql$/i.test(fileName)) {
+        // Only copy files with .sql extension
+        await fs.copyFile(filePath, path.join(targetPath, fileName));
       } else {
         const template = await fs.readFile(filePath, "utf-8");
         const rendered = ejs.render(template, { appName });
@@ -124,7 +128,8 @@ async function generate(
     }
   }
 
+  const isTs: boolean = language === "typescript";
   if (preferences.injection || data?.injection === "pre installed") {
-    await injectDb(targetPath, database);
+    await injectDb(targetPath, database, isTs);
   }
 }
