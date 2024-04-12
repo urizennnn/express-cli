@@ -13,26 +13,24 @@ export interface User {
 export const args = hideBin(process.argv);
 export const prompt = inquirer.createPromptModule();
 
-export function loadingBar(command:string) {
+export function loadingBar(command: string) {
   const totalTicks = 10;
   let ticks = 0;
   const loadingInterval = setInterval(() => {
     process.stdout.clearLine(0);
     process.stdout.cursorTo(0);
-
     const progress = ".".repeat(ticks) + " ".repeat(totalTicks - ticks);
     process.stdout.write(`${command} [${progress}]`);
-
     if (++ticks > totalTicks) {
       ticks = 0;
     }
   }, 100);
   return loadingInterval;
 }
+
 export function loadingBarPromise(command: string): Promise<void> {
   const totalTicks = 10;
   let ticks = 0;
-
   return new Promise((resolve) => {
     const loadingInterval = setInterval(() => {
       ticks++;
@@ -40,17 +38,17 @@ export function loadingBarPromise(command: string): Promise<void> {
       process.stdout.clearLine(0);
       process.stdout.cursorTo(0);
       process.stdout.write(`${command} [${progress}]`);
-      
       if (ticks >= totalTicks) {
         clearInterval(loadingInterval);
-        process.stdout.write('\n'); 
+        process.stdout.clearLine(0);
+        process.stdout.cursorTo(0);
         resolve();
       }
     }, 100);
   });
-};
+}
 
-export let preferences :User= {
+export let preferences: User = {
   packageManager: undefined,
   language: undefined,
   injection: undefined,
@@ -65,7 +63,7 @@ export const dependencies = [
   "helmet",
   "morgan",
   "http-status-codes",
-  "dotenv"
+  "dotenv",
 ];
 
 export const devDependencies = [
@@ -76,4 +74,19 @@ export const devDependencies = [
   "prettier",
 ];
 
-
+export const dependenciesWithTypes = [
+  "@types/express",
+  "@types/cookie-parser",
+  "@types/cors",
+  "@types/express-session",
+  "@types/helmet",
+  "@types/morgan",
+  "@types/http-status-codes",
+  "@types/dotenv",
+];
+export const devDependenciesWithTypes = [
+  "@types/nodemon",
+  "@types/eslint",
+  "@types/mocha",
+  "@types/chai",
+];

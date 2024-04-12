@@ -5,10 +5,9 @@ import { createFolderAndWriteConfig } from "./helper.js";
 import chalk from "chalk";
 import { deleteFile } from "../../../process/deleteFile.js";
 import path from "path";
-import { temp } from "./prompt.js";
 import { exit } from "node:process";
 
-
+export let temp = path.join(__dirname, "../../generator/templates/");
 export async function createExpress(name: string): Promise<void> {
   try {
     const question = [
@@ -43,22 +42,30 @@ export async function createExpress(name: string): Promise<void> {
     ];
 
     prompt(question).then(async (answer) => {
-
       preferences.language = answer.language;
       preferences.database = answer.database;
       preferences.injection = answer.dependency;
       preferences.packageManager = answer.package;
 
       createFolderAndWriteConfig(preferences);
-      await Promise.all([
-       generateFiles(process.cwd(), "templates", name, true),
-        deleteFile(path.join(temp, "Database")),
-        deleteFile(path.join(temp, "Models")),
-       
-      ]);
+      if (answer.language === "TypeScript") {
+        temp = path.join(__dirname, "../../generator/templates/TS");
+        await Promise.all([
+          generateFiles(process.cwd(), "templates/TS", name, true),
+          deleteFile(path.join(temp, "Database")),
+          deleteFile(path.join(temp, "Models")),
+        ]);
+      } else {
+        await Promise.all([
+          (temp = path.join(__dirname, "../../generator/templates/JS")),
+          generateFiles(process.cwd(), "templates/JS", name, true),
+          deleteFile(path.join(temp, "Database")),
+          deleteFile(path.join(temp, "Models")),
+        ]);
+      }
     });
-  } catch (e) {
-    console.log(chalk.red(e));
+  } catch (e: any) {
+    console.log(chalk.red(e.stack));
     exit(1);
   }
 }
@@ -71,19 +78,23 @@ export async function installDependencies(...args: string[]): Promise<void> {
 
   const packageManager: string = preferences.packageManager || "npm";
 
-  exec(`${packageManager} install ${argv}`, (error: Error | null) => {
-    clearInterval(interval);
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
-    process.stdout.write("\nInstalled [.........]");
+  exec(
+    `${packageManager} install ${argv}`,
+    { windowsHide: true, cwd: process.cwd() },
+    (error: Error | null) => {
+      clearInterval(interval);
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write("\nInstalled [.........]");
 
-    if (error) {
-      console.error(`${packageManager} install error: ${error.message}`);
-      return;
+      if (error) {
+        console.error(`${packageManager} install error: ${error.message}`);
+        return;
+      }
+
+      console.log(chalk.green(`\nSuccessfully installed ${argv}.`));
     }
-
-    console.log(chalk.green(`\nSuccessfully installed ${argv}.`));
-  });
+  );
 }
 
 export async function removeDependencies(...args: string[]): Promise<void> {
@@ -92,17 +103,21 @@ export async function removeDependencies(...args: string[]): Promise<void> {
   console.log(chalk.green(`Removing ${argv}...`));
   const interval = loadingBar("Removing");
 
-  exec(`npm remove ${argv}`, (error: Error | null) => {
-    clearInterval(interval);
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
-    process.stdout.write("\nRemoved [.........]");
+  exec(
+    `npm remove ${argv}`,
+    { cwd: process.cwd(), windowsHide: true },
+    (error: Error | null) => {
+      clearInterval(interval);
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write("\nRemoved [.........]");
 
-    if (error) {
-      console.error(`npm remove error: ${error.message}`);
-      return;
+      if (error) {
+        console.error(`npm remove error: ${error.message}`);
+        return;
+      }
+
+      console.log(chalk.green(`\nSuccessfully removed ${argv}.`));
     }
-
-    console.log(chalk.green(`\nSuccessfully removed ${argv}.`));
-  });
+  );
 }

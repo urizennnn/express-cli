@@ -1,6 +1,6 @@
 {
   "name": "@urizen/express-cli",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "dependencies": {
     "@types/ejs": "^3.1.5",
@@ -47,6 +47,6 @@
   },
   "homepage": "",
   "keywords": [
-    "cli"
+    "cli","express"
   ]
 }

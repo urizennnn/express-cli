@@ -22,7 +22,7 @@ export async function createJsonUponFreshStart({
     const generatePackageJson = new Promise<void>((resolve, reject) => {
       exec(
         `${PackageManager} init -y`,
-        { cwd: name },
+        { cwd: name ,windowsHide:true},
         (error: Error | null) => {
           if (error) {
             console.error(`Error generating package.json: ${error}`);
@@ -37,7 +37,7 @@ export async function createJsonUponFreshStart({
     const installExpress = new Promise<void>((resolve, reject) => {
       exec(
         `${PackageManager} install express`,
-        { cwd: name },
+        { cwd: name ,windowsHide:true},
         (error: Error | null) => {
           if (error) {
             console.error(chalk.red(`Error installing express: ${error}`));

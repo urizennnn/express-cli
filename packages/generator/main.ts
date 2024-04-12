@@ -2,13 +2,14 @@ import ejs from "ejs";
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
-import { dependencies, loadingBar, preferences } from "../config/cli.config";
+import { preferences } from "../config/cli.config";
 import { createJsonUponFreshStart } from "../../process/createJSON";
-import { helperInject } from "./inject";
+import { helperInject, helperInjectTS } from "./inject";
 import { readConfig } from "../../process/readConfig";
 import { injectEnv } from "../../process/injectEnv";
 import { deleteFolder } from "../../process/deleteFile";
-import { injectDb, injectDefault } from "../../process/injectDependencies";
+import { injectDb } from "../../process/injectDependencies";
+import { initTs } from "../../process/TS/init";
 
 export const generateFiles = async (
   targetDir: string,
@@ -19,17 +20,18 @@ export const generateFiles = async (
   try {
     await generate(targetDir, templateDir, cdname, flag);
   } catch (error: any) {
-    console.log(chalk.red(error.stack || error));
+    console.log(chalk.red(error.stack));
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
 
 export const generateDefaultFiles = async (
   targetDir: string,
   templateDir: string,
   cdname: string,
-  flag: boolean = false
+  flag: boolean
 ) => {
   try {
     const data = await readConfig();
@@ -38,10 +40,11 @@ export const generateDefaultFiles = async (
     }
     await generate(targetDir, templateDir, cdname, flag, data);
   } catch (error: any) {
-    console.log(chalk.red(error.stack || error));
+    console.log(chalk.red(error.stack));
     await deleteFolder(path.join(targetDir, cdname));
     process.exit(1);
   }
+  process.exit(0); // Exit after the generate function completes successfully
 };
 
 async function generate(
@@ -52,7 +55,14 @@ async function generate(
   data?: any
 ) {
   const database = data ? data.database : preferences.database;
-  await helperInject(database);
+  const language = (data?.language ?? preferences.language).toLowerCase();
+
+  if (language === "typescript") {
+    await helperInjectTS(database);
+  } else if (language === "javascript") {
+    await helperInject(database);
+  }
+
   await injectEnv(database);
 
   const templatePath = path.join(__dirname, templateDir);
@@ -61,7 +71,7 @@ async function generate(
 
   if (await fs.pathExists(targetPath)) {
     console.log(chalk.red(`Folder ${appName} already exists`));
-    process.exit(0);
+    process.exit(1);
   }
 
   await fs.ensureDir(targetPath);
@@ -69,10 +79,14 @@ async function generate(
   const extension =
     (data && data.language === "TypeScript") ||
     preferences.language === "TypeScript"
-      ? (() => {
-          throw new Error("Sorry TypeScript support coming soon.");
-        })()
+      ? "ts"
       : "js";
+
+  if (extension === "ts") {
+    if (flag) {
+      await initTs(targetPath);
+    }
+  }
 
   if (flag) {
     await createJsonUponFreshStart({
@@ -86,6 +100,8 @@ async function generate(
     if (file.startsWith(".git")) {
       continue;
     }
+    if (path.extname(file) === "sql") continue;
+
     const filePath = path.join(templatePath, file);
     const targetFilePath = path.join(
       targetPath,
@@ -105,9 +121,11 @@ async function generate(
       }
     } else if (stats.isDirectory()) {
       const subDir = path.join(templateDir, file);
-      await generate(targetPath, subDir, path.basename(file), flag, data);
+      await generate(targetPath, subDir, path.basename(file), false, data);
     }
   }
-  if (preferences.injection || data.injection === "pre installed"){
- await injectDb(targetPath,database)}
+  let isTs: boolean = language === "typescript" ? true : false;
+  if (preferences.injection || data?.injection === "pre installed") {
+    await injectDb(targetPath, database, isTs);
+  }
 }
