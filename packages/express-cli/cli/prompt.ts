@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import path from "path";
 import yargs from "yargs";
 import { args, prompt } from "../../config/cli.config.js";
 import {
@@ -8,11 +7,10 @@ import {
   removeDependencies,
 } from "./cli.js";
 
-import { deleteFile } from "../../../process/deleteFile.js";
 import { exit } from "node:process";
 import { generateDefaultFiles } from "../../generator/main.js";
 
-export const temp = path.join(__dirname,"../../generator/templates");
+
 
 yargs.command({
   command: "create <appName>",
@@ -40,19 +38,15 @@ yargs.command({
         if (response === "no" || response === "n" || response === "N") {
           await createExpress(appName);
           return exit(1);
-        }else {
-          await generateDefaultFiles(process.cwd(), "templates", appName, true);
+        } else {
+          await generateDefaultFiles(process.cwd(), "templates/JS", appName, true);
           return exit(1);
         }
-        
       }
-      
     }
-   await createExpress(appName)
 
- 
-
-  }
+    await createExpress(appName);
+  },
 });
 
 yargs.command({

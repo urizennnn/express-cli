@@ -1,9 +1,10 @@
 packages
-./process
-./test
+process
+test
 .*
 tsconfig.json
 yarn.lock
 *.bat
 node_modules
 ./dist/packages/generators/templates
+test.js

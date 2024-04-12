@@ -3,7 +3,6 @@ import {
   dependencies,
   devDependencies,
   preferences,
-  
 } from "../packages/config/cli.config";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -24,40 +23,36 @@ export async function injectDefault(name: string) {
   } else if (preferences.packageManager || data.packageManager === "yarn") {
     command = "add";
   }
-  let manager:string;
+  let manager: string;
   if (preferences.packageManager === undefined) {
-    manager =  data.packageManager;
-  }else {
-    manager = preferences.packageManager
+    manager = data.packageManager;
+  } else {
+    manager = preferences.packageManager;
   }
   for (const dev of dependencies) {
     try {
-      await asyncExec(
-        `${manager} ${command} ${dev} `,
-        {
-          cwd: name,
-        }
-      );
+      await asyncExec(`${manager} ${command} ${dev} `, {
+        cwd: name,
+        windowsHide: true,
+      });
     } catch (err: any) {
       console.error(chalk.red(err.message));
     }
   }
   for (const dev of devDependencies) {
     try {
-      await asyncExec(
-        `${manager} ${command} -D ${dev} `,
-        {
-          cwd: name,
-        }
-      );
+      await asyncExec(`${manager} ${command} -D ${dev} `, {
+        cwd: name,
+        windowsHide: true,
+      });
     } catch (err: any) {
       console.error(chalk.red(err.message));
     }
   }
 }
 
-export const injectDb = async (targetPath:string,database:string)=>{
-   if (database === "MongoDB") {
+export const injectDb = async (targetPath: string, database: string) => {
+  if (database === "MongoDB") {
     dependencies.push("mongoose");
     await injectDefault(targetPath);
   } else if (database === "MSQL") {
@@ -69,4 +64,4 @@ export const injectDb = async (targetPath:string,database:string)=>{
   } else if (database === "Other") {
     await injectDefault(targetPath);
   }
-}
+};

@@ -1,11 +1,23 @@
-import path from "path";
-import fs from "fs-extra";
-const main = path.join(__dirname, "../packages/generator/templates/JS");
+import * as path from "path";
+import * as fs from "fs-extra";
 
-export async function installMongo() {
+const main = path.join(__dirname, "../../packages/generator/templates/TS");
+
+export async function installTSMongo() {
   try {
     const tempPath = path.join(main, "Database");
-    const data = `const mongoose = require('mongoose');\n async function Mongoconnect(url) {\n try { \n  await mongoose.connect(url, { serverSelectionTimeoutMS: 5000 });  \n console.log("Connected to the MongoDB database.");\n } catch (error) {\n console.error("Error connecting to the database:", error) \n }}\n\n \n module.exports = Mongoconnect;`;
+    const data: string = `import mongoose from 'mongoose';
+
+async function Mongoconnect(url: string) {
+  try {
+    await mongoose.connect(url, { serverSelectionTimeoutMS: 5000 });
+    console.log("Connected to the MongoDB database.");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+  }
+}
+
+export default Mongoconnect;`;
 
     await fs.writeFile(path.join(tempPath, "mongo.ejs"), data, {
       encoding: "utf-8",
@@ -13,11 +25,10 @@ export async function installMongo() {
 
     const modelsPath = path.join(main, "Models");
 
-    const schema = `const mongoose = require('mongoose');
+    const schema: string = `import mongoose, { Schema } from 'mongoose';
 
 // Define schema
-const Schema = mongoose.Schema;
-const MySchema = new Schema({
+const MySchema: Schema = new Schema({
     // Define your schema fields here
     field1: { type: String, required: true },
     field2: { type: Number, required: true },
@@ -27,21 +38,21 @@ const MySchema = new Schema({
 // Create model
 const MyModel = mongoose.model('MyModel', MySchema);
 
-module.exports = MyModel;
+export default MyModel;
 `;
 
     await fs.writeFile(path.join(modelsPath, "models.ejs"), schema, {
       encoding: "utf-8",
     });
-  } catch (error) {
-    console.error("Error installing Mongo:", error);
+  } catch (error: any) {
+    console.error("Error installing Mongo:", error.stack);
   }
 }
 
-export async function installMSQL() {
+export async function installTSMSQL() {
   try {
     const tempPath = path.join(main, "Database");
-    const data = `const mysql = require('mysql');
+    const data: string = `import mysql from 'mysql';
 
 // Create connection
 const connection = mysql.createConnection({
@@ -49,7 +60,7 @@ const connection = mysql.createConnection({
     user: process.env.USER || "",
     password: process.env.PASSWORD || "",
     database: process.env.DATABASE || "",
-    port: process.env.DB-PORT || 3306,
+    port: process.env.DB_PORT || 3306,
 });
 
 // Connect to the database
@@ -71,36 +82,35 @@ connection.connect((err) => {
 
     const modelsPath = path.join(main, "Models");
 
-    const schema = `CREATE TABLE IF NOT EXISTS TableName (
+    const schema: string = `CREATE TABLE IF NOT EXISTS TableName (
     id INT AUTO_INCREMENT PRIMARY KEY,
     field1 VARCHAR(255) NOT NULL,
     field2 INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 `;
 
     await fs.writeFile(path.join(modelsPath, "models.sql"), schema, {
       encoding: "utf-8",
     });
-  } catch (error) {
-    console.error("Error installing MySQL:", error);
+  } catch (error: any) {
+    console.error("Error installing MySQL:", error.stack);
   }
 }
 
-export async function installPGSQL() {
+export async function installTSPGSQL() {
   try {
     const tempPath = path.join(main, "Database");
-    const data = `const { Client } = require('pg');
+    const data: string = `import { Client } from 'pg';
 
 // Create a PostgreSQL client instance
 const client = new Client({
- host: process.env.HOST || "",
+    host: process.env.HOST || "",
     user: process.env.USER || "",
     password: process.env.PASSWORD || "",
     database: process.env.DATABASE || "",
-    port: process.env.DB-PORT || 5432,
+    port: process.env.DB_PORT || 5432,
 });
 
 // Connect to the PostgreSQL database
@@ -123,20 +133,21 @@ client.connect()
 
     const modelsPath = path.join(main, "Models");
 
-    const schema = `CREATE TABLE IF NOT EXISTS TableName (
+    const schema: string = `CREATE TABLE IF NOT EXISTS TableName (
     id SERIAL PRIMARY KEY,
     field1 VARCHAR(255) NOT NULL,
     field2 INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 `;
 
     await fs.writeFile(path.join(modelsPath, "models.sql"), schema, {
       encoding: "utf-8",
     });
-  } catch (error) {
-    console.error("Error installing PostgreSQL:", error);
+  } catch (error: any) {
+    console.error("Error installing PostgreSQL:", error.stack);
   }
 }
+
+
