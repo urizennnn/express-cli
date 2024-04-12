@@ -96,11 +96,11 @@ async function generate(
   }
 
   const files = await fs.readdir(templatePath);
-
   for (const file of files) {
     if (file.startsWith(".git")) {
       continue;
     }
+    if (path.extname(file) === "sql") continue;
 
     const filePath = path.join(templatePath, file);
     const targetFilePath = path.join(
@@ -128,7 +128,10 @@ async function generate(
     }
   }
 
-  const isTs: boolean = language === "typescript";
+
+
+  let isTs: boolean = language === "typescript" ? true : false;
+
   if (preferences.injection || data?.injection === "pre installed") {
     await injectDb(targetPath, database, isTs);
   }
