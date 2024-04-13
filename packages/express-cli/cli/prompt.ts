@@ -12,6 +12,7 @@ import { generateDefaultFiles } from "../../generator/main.js";
 
 
 
+
 yargs.command({
   command: "create <appName>",
   aliases: ["new"],

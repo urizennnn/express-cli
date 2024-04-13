@@ -1,17 +1,11 @@
 import { exec } from "child_process";
-import { promisify } from "util";
-import chalk from "chalk";
 
-const execPromise = promisify(exec);
-
-export async function initTs(path: string) {
+export async function initTs(cwd: string) {
   try {
-  await execPromise("tsc --init", {
-      cwd: path,
-      windowsHide: true,
-    });
     
-  } catch (err:any) {
-   throw new Error(err)
+      exec("tsc --init", { cwd, windowsHide: true });
+    
+  } catch (err: any) {
+    throw new Error(err);
   }
 }
