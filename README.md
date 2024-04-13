@@ -1,4 +1,5 @@
-
+# Unstable Releases 
+At the moment express-cli is in it's phase of unstable constant releases dut to the fact of ghost bugs and also wanting to develop the cli as user counts increases to accomodate as much features as uses request.
 
 # Usage
 ## Installation 

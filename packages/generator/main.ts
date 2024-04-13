@@ -18,7 +18,18 @@ export const generateFiles = async (
   flag: boolean = false
 ) => {
   try {
+    const data = await readConfig();
     await generate(targetDir, templateDir, cdname, flag);
+    console.log(chalk.green("Project generated successfully!\n\n\n\n"));
+    console.log(
+      chalk.green("To start the project, run the following commands:\n\n\n\n")
+    );
+    if (
+      preferences.language === "JavaScript" ||
+      data?.language === "JavaScript"
+    ) {
+      console.log(chalk.green(`cd ${cdname}\n\n\n npm start`));
+    }
   } catch (error: any) {
     console.log(chalk.red(error.stack));
     await deleteFolder(path.join(targetDir, cdname));
@@ -46,8 +57,6 @@ export const generateDefaultFiles = async (
   }
   process.exit(0); // Exit after the generate function completes successfully
 };
-
-
 
 async function generate(
   targetDir: string,
@@ -94,6 +103,11 @@ async function generate(
       PackageManager: data ? data.packageManager : preferences.packageManager,
     });
   }
+  let isTs: boolean = language === "typescript" ? true : false;
+
+  if (preferences.injection || data?.injection === "pre installed") {
+    await injectDb(targetPath, database, isTs);
+  }
 
   const files = await fs.readdir(templatePath);
   for (const file of files) {
@@ -115,7 +129,6 @@ async function generate(
       if (fileName.startsWith(".env")) {
         await fs.copyFile(filePath, targetFilePath);
       } else if (/\.sql$/i.test(fileName)) {
-        // Only copy files with .sql extension
         await fs.copyFile(filePath, path.join(targetPath, fileName));
       } else {
         const template = await fs.readFile(filePath, "utf-8");
@@ -126,13 +139,5 @@ async function generate(
       const subDir = path.join(templateDir, file);
       await generate(targetPath, subDir, path.basename(file), false, data);
     }
-  }
-
-
-
-  let isTs: boolean = language === "typescript" ? true : false;
-
-  if (preferences.injection || data?.injection === "pre installed") {
-    await injectDb(targetPath, database, isTs);
   }
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { hideBin } from "yargs/helpers";
-import minimist from "minimist";
+import yargs from "yargs";
 import inquirer from "inquirer";
 
 export interface User {
@@ -9,6 +9,9 @@ export interface User {
   injection: undefined | string;
   database: undefined | string;
 }
+
+yargs.scriptName("cli").showHelpOnFail(false);
+  
 
 export const args = hideBin(process.argv);
 export const prompt = inquirer.createPromptModule();
@@ -90,3 +93,5 @@ export const devDependenciesWithTypes = [
   "@types/mocha",
   "@types/chai",
 ];
+
+

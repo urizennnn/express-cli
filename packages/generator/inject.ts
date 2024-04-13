@@ -19,7 +19,7 @@ export async function helperInject(database: string) {
       await installMSQL();
     } else if (database === "PGSQL") {
       await installPGSQL();
-    }
+    } else return;
   } catch (e) {
     console.log(chalk.red(e));
     exit(1);
@@ -33,7 +33,7 @@ export async function helperInjectTS(database: string) {
       await installTSMSQL();
     } else if (database === "PGSQL") {
       await installTSPGSQL();
-    }
+    } else return 
   } catch (e: any) {
     console.log(chalk.red(e.stack));
     exit(1);
