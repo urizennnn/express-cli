@@ -4,8 +4,15 @@ import { readConfig } from "./readConfig";
 import { exit } from "node:process";
 import path from "path";
 import fse from "fs-extra";
+import { preferences } from "../packages/config/cli.config";
 
-export async function createJsonUponFreshStart({ name, PackageManager }: { name: string; PackageManager?: string; }) {
+export async function createJsonUponFreshStart({
+  name,
+  PackageManager,
+}: {
+  name: string;
+  PackageManager?: string;
+}) {
   try {
     const details = await readConfig();
     PackageManager = PackageManager || details.packageManager;
@@ -55,9 +62,26 @@ export async function createJsonUponFreshStart({ name, PackageManager }: { name:
     };
 
     await Promise.all([generatePackageJson, installExpress]);
-    await addScripts(name);
+    if (
+      preferences.language === "TypeScript" ||
+      details.language === "TypeScript"
+    ) {
+      await tsScripts(name);
+    } else await addScripts(name);
   } catch (e) {
     console.log(chalk.red(e));
     exit(1);
   }
 }
+
+const tsScripts = async (name: string) => {
+  const JsonPath = path.join(name, "package.json");
+  const Json = await fse.readJson(JsonPath);
+  Json.scripts = {
+    prestart: "tsc",
+    start: "nodemon dist/index.ts",
+    build: "tsc",
+    "build:watch": "tsc -w",
+  };
+  await fse.writeJson(JsonPath, Json, { spaces: 2 });
+};
