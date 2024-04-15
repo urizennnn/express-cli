@@ -18,18 +18,17 @@ export const generateFiles = async (
   flag: boolean = false
 ) => {
   try {
-    const data = await readConfig();
     await generate(targetDir, templateDir, cdname, flag);
-    console.log(chalk.green("Project generated successfully!\n\n\n\n"));
     console.log(
-      chalk.green("To start the project, run the following commands:\n\n\n\n")
+      chalk.green(
+        `Project generated successfully!\n\n\n\n\n To start the project, run the following commands:\n\n\n\n
+        If your project is Type enabled do specify which folder you want the outped files in. (default:dist) and run npm build \n\n\n\n
+        If not run npm start for none Type enabled projects\n\n\n\n
+        
+        Thank you for using our generator!
+        please read our documetation to find out where to open an issue if need be.`
+      )
     );
-    if (
-      preferences.language === "JavaScript" ||
-      data?.language === "JavaScript"
-    ) {
-      console.log(chalk.green(`cd ${cdname}\n\n\n npm start`));
-    }
   } catch (error: any) {
     console.log(chalk.red(error.stack));
     await deleteFolder(path.join(targetDir, cdname));
