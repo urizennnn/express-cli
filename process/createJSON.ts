@@ -26,7 +26,7 @@ export async function createJsonUponFreshStart({
       exec(
         `${PackageManager} init -y`,
         { cwd: name, windowsHide: true },
-        (error: Error | null, stdout: string, stderr: string) => {
+        (error: Error | null) => {
           if (error) {
             console.error(`Error generating package.json: ${error}`);
             reject(error);
@@ -41,7 +41,7 @@ export async function createJsonUponFreshStart({
       exec(
         `${PackageManager} install express`,
         { cwd: name, windowsHide: true },
-        (error: Error | null, stdout: string, stderr: string) => {
+        (error: Error | null) => {
           if (error) {
             console.error(chalk.red(`Error installing express: ${error}`));
             reject(error);
@@ -82,6 +82,23 @@ const tsScripts = async (name: string) => {
     start: "nodemon dist/index.ts",
     build: "tsc",
     "build:watch": "tsc -w",
-  };
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "jest",
+  }, {
+    "jest": {
+      "testEnvironment": "node",
+      "transform": {
+        "^.+\\.ts$": "ts-jest"
+      },
+      "moduleFileExtensions": [
+        "ts",
+        "js",
+        "json",
+        "node"
+      ],
+      "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(js|ts)$"
+    }
+  }
   await fse.writeJson(JsonPath, Json, { spaces: 2 });
 };
