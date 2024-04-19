@@ -11,7 +11,7 @@ export interface User {
 }
 
 yargs.scriptName("cli").showHelpOnFail(false);
-  
+
 
 export const args = hideBin(process.argv);
 export const prompt = inquirer.createPromptModule();
@@ -75,6 +75,7 @@ export const devDependencies = [
   "mocha",
   "chai",
   "prettier",
+  "eslint"
 ];
 
 export const dependenciesWithTypes = [
@@ -86,12 +87,20 @@ export const dependenciesWithTypes = [
   "@types/morgan",
   "@types/http-status-codes",
   "@types/dotenv",
+  "ts-node",
 ];
 export const devDependenciesWithTypes = [
   "@types/nodemon",
   "@types/eslint",
   "@types/mocha",
   "@types/chai",
+  "@types/prettier",
+  "@types/node",
+  "@typescript-eslint/parser",
+  "@typescript-eslint/eslint-plugin",
+  "eslint-config-prettier",
+  "eslint-plugin-prettier",
+
 ];
 
 
