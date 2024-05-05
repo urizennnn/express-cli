@@ -2,18 +2,19 @@ package cli
 
 import (
 	"fmt"
-	"io"
-	"os"
-	"strings"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	// config "github.com/urizennnn/express-cli/cli/config"
+	"io"
+	"os"
+	"strings"
 )
 
 const listHeight = 14
 
 var (
+	number            = 0
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
 	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
@@ -75,6 +76,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = string(i)
+				number++
+				List()
 			}
 			return m, tea.Quit
 		}
@@ -87,7 +90,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.choice != "" {
-		return quitTextStyle.Render(fmt.Sprintf("%s? Sounds good to me.", m.choice))
+		return quitTextStyle.Render(fmt.Sprintf("%s", m.choice))
 	}
 	if m.quitting {
 		return quitTextStyle.Render("Not hungry? That’s cool.")
@@ -95,24 +98,13 @@ func (m model) View() string {
 	return "\n" + m.list.View()
 }
 
-func main() {
-	items := []list.Item{
-		item("Ramen"),
-		item("Tomato Soup"),
-		item("Hamburgers"),
-		item("Cheeseburgers"),
-		item("Currywurst"),
-		item("Okonomiyaki"),
-		item("Pasta"),
-		item("Fillet Mignon"),
-		item("Caviar"),
-		item("Just Wine"),
-	}
-
+func List() {
+	items := UpdateList()
 	const defaultWidth = 20
 
 	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
-	l.Title = "What do you want for dinner?"
+	title, length := UpdateTitle()
+	l.Title = title
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.Styles.Title = titleStyle
@@ -120,9 +112,58 @@ func main() {
 	l.Styles.HelpStyle = helpStyle
 
 	m := model{list: l}
-
+	if number == 5 {
+		fmt.Println(length)
+		os.Exit(0)
+	}
 	if _, err := tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
+	}
+}
+
+func UpdateTitle() (string, int) {
+	title := []string{"What package Manager do you want to use", "What language would you like to use", "What database would you like to use", "Would you like dependencies installed or fresh start"}
+	length := len(title)
+	if number >= 0 && number < length {
+		return title[number], length
+	}
+	return "", length
+}
+func UpdateList() []list.Item {
+	lists_0 := []list.Item{
+		item("npm"),
+		item("yarn"),
+		item("pnpm"),
+	}
+
+	lists_1 := []list.Item{
+		item("JavaScript"),
+		item("TypeScript"),
+	}
+
+	lists_2 := []list.Item{
+		item("MongoDB"),
+		item("PostgreSQL"),
+		item("MySQL"),
+	}
+
+	lists_3 := []list.Item{
+		item("Yes"),
+		item("No, I want fresh start with no dependencies"),
+	}
+
+	switch number {
+	case 0:
+		return lists_0
+	case 1:
+		return lists_1
+	case 2:
+		return lists_2
+	case 3:
+		return lists_3
+	default:
+		return nil
+
 	}
 }
