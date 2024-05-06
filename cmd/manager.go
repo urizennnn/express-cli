@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/urizennnn/express-cli/functions/cli"
 )
 
 var installCmd = &cobra.Command{
@@ -11,7 +10,7 @@ var installCmd = &cobra.Command{
 	Short: "Built in package manager to install dependencies.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("manager called")
+		cli.Install(args...)
 	},
 }
 

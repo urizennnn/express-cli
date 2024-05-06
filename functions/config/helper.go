@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	// Available spinners
 	spinners = []spinner.Spinner{
 		spinner.Line,
 		spinner.Dot,
