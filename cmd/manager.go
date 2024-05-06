@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/functions/cli"
+	"github.com/urizennnn/express-cli/spinner"
 )
 
 var installCmd = &cobra.Command{
@@ -10,6 +11,7 @@ var installCmd = &cobra.Command{
 	Short: "Built in package manager to install dependencies.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		spinner.Packages = append(spinner.Packages, args...)
 		cli.Install(args...)
 	},
 }

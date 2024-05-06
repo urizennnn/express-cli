@@ -3,10 +3,11 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/urizennnn/express-cli/functions/config"
-	spinner "github.com/urizennnn/express-cli/spinner"
 	"os"
 	"os/exec"
+
+	"github.com/urizennnn/express-cli/functions/config"
+	"github.com/urizennnn/express-cli/spinner"
 )
 
 func Install(packageName ...string) {
@@ -32,9 +33,8 @@ func Install(packageName ...string) {
 
 	// Separate the command and its arguments
 	for _, pkg := range packageName {
-		spinner.Get_packages(pkg)
-		spinner.Install_progress()
 		cmd := exec.Command(manager, "install", pkg)
+		spinner.Run()
 
 		// Set the command's output to be captured
 		cmd.Stderr = os.Stderr

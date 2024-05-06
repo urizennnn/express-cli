@@ -1,4 +1,4 @@
-package config
+package spinner
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func newModel() model {
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("63"))
 	return model{
-		packages: Get_packages(),
+		packages: getPackages(),
 		spinner:  s,
 		progress: p,
 	}
@@ -128,13 +128,12 @@ func max(a, b int) int {
 	return b
 }
 
-func Install_progress() {
+func Run() {
 	if _, err := tea.NewProgram(newModel()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
 }
-
 func Get_packages(packages ...string) []string {
 	return packages
 }
