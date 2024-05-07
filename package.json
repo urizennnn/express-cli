@@ -24,4 +24,8 @@
     "cli",
     "express",
     "golang"
-  ]}
+  ],
+  "dependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
