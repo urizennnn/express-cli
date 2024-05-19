@@ -3,19 +3,16 @@ package process
 import (
 	"embed"
 	err "errors"
-	"github.com/urizennnn/express-cli/errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/urizennnn/express-cli/errors"
 )
 
 //go:embed generator
 var TemplateDir embed.FS
-
-func ChangeFileExtension(filename, newExt string) string {
-	ext := filepath.Ext(filename)
-	return filename[:len(filename)-len(ext)] + newExt
-}
 
 func CopyFile(srcPath, destPath string, fsys embed.FS) error {
 	input, err := fsys.ReadFile(srcPath)
@@ -37,6 +34,7 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	}
 
 	for _, entry := range entries {
+		fmt.Println(entry.Name())
 		oldPath := filepath.Join(srcPath, entry.Name())
 		newPath := filepath.Join(destPath, entry.Name())
 
@@ -46,15 +44,12 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 			}
 		} else {
 			if entry.Name() != "dependencies.json" {
-				if entry.Name() == "README.md" {
-					if err := CopyFile(oldPath, newPath, fsys); err != nil {
-						return err
-					}
-				} else {
-					newPath = ChangeFileExtension(newPath, "."+ext)
-					if err := CopyFile(oldPath, newPath, fsys); err != nil {
-						return err
-					}
+				if entry.Name() == ".eslintrc.js" || entry.Name() == ".prettierrc" {
+					err := CopyFile(oldPath, newPath, fsys)
+					errors.Check_Err(err)
+				}
+				if err := CopyFile(oldPath, newPath, fsys); err != nil {
+					return err
 				}
 			}
 		}
@@ -84,5 +79,7 @@ func CopyFilesToCWD(cwd, name, ext string) error {
 	}
 
 	InstallDependencies(ext, folderPath)
+	gitInit(folderPath)
+
 	return nil
 }

@@ -53,3 +53,10 @@ func InstallDependencies(ext, cwd string) {
 
 	fmt.Println("Target file not found:", targetFile)
 }
+
+func gitInit(cwd string) {
+	commad := exec.Command("git", "init")
+	commad.Dir = cwd
+	err := commad.Run()
+	errors.Check_Err(err)
+}
