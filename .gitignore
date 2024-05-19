@@ -3,3 +3,4 @@ dist
 test.js
 .npmrc
 main
+.env

@@ -2,9 +2,9 @@ package process
 
 import (
 	"embed"
-	"errors"
+	err "errors"
+	"github.com/urizennnn/express-cli/errors"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -19,17 +19,13 @@ func ChangeFileExtension(filename, newExt string) string {
 
 func CopyFile(srcPath, destPath string, fsys embed.FS) error {
 	input, err := fsys.ReadFile(srcPath)
-	if err != nil {
-		return err
-	}
+	errors.Check_Err(err)
 
-	if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
-		return err
-	}
+	err = os.MkdirAll(filepath.Dir(destPath), 0755)
+	errors.Check_Err(err)
 
-	if err := os.WriteFile(destPath, input, 0644); err != nil {
-		return err
-	}
+	err = os.WriteFile(destPath, input, 0644)
+	errors.Check_Err(err)
 
 	return nil
 }
@@ -50,9 +46,15 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 			}
 		} else {
 			if entry.Name() != "dependencies.json" {
-				newPath = ChangeFileExtension(newPath, "."+ext)
-				if err := CopyFile(oldPath, newPath, fsys); err != nil {
-					return err
+				if entry.Name() == "README.md" {
+					if err := CopyFile(oldPath, newPath, fsys); err != nil {
+						return err
+					}
+				} else {
+					newPath = ChangeFileExtension(newPath, "."+ext)
+					if err := CopyFile(oldPath, newPath, fsys); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -64,7 +66,7 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 func CopyFilesToCWD(cwd, name, ext string) error {
 	folderPath := filepath.Join(cwd, name)
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
-		return err
+		errors.Check_Err(err)
 	}
 
 	var jointPath string
@@ -74,25 +76,13 @@ func CopyFilesToCWD(cwd, name, ext string) error {
 	case "ts":
 		jointPath = "generator/TS"
 	default:
-		return errors.New("unsupported extension")
+		return err.New("unsupported extension")
 	}
 
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {
-		return err
+		errors.Check_Err(err)
 	}
 
 	InstallDependencies(ext, folderPath)
 	return nil
-}
-
-func main() {
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Failed to get current working directory: %v", err)
-	}
-
-	err = CopyFilesToCWD(cwd, "projectName", "js")
-	if err != nil {
-		log.Fatalf("Failed to copy files: %v", err)
-	}
 }
