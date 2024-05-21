@@ -3,15 +3,15 @@ package process
 import (
 	"embed"
 	err "errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/urizennnn/express-cli/errors"
+	"github.com/urizennnn/express-cli/functions/config"
 )
 
-//go:embed generator
+//go:embed all:generator
 var TemplateDir embed.FS
 
 func CopyFile(srcPath, destPath string, fsys embed.FS) error {
@@ -34,7 +34,6 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	}
 
 	for _, entry := range entries {
-		fmt.Println(entry.Name())
 		oldPath := filepath.Join(srcPath, entry.Name())
 		newPath := filepath.Join(destPath, entry.Name())
 
@@ -58,7 +57,8 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	return nil
 }
 
-func CopyFilesToCWD(cwd, name, ext string) error {
+func CopyFilesToCWD(cwd, name, ext string, isDone chan bool) error {
+	go config.Spinner(isDone)
 	folderPath := filepath.Join(cwd, name)
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
 		errors.Check_Err(err)
@@ -66,9 +66,9 @@ func CopyFilesToCWD(cwd, name, ext string) error {
 
 	var jointPath string
 	switch ext {
-	case "js":
+	case "JavaScript":
 		jointPath = "generator/JS"
-	case "ts":
+	case "TypeScript":
 		jointPath = "generator/TS"
 	default:
 		return err.New("unsupported extension")
@@ -81,5 +81,6 @@ func CopyFilesToCWD(cwd, name, ext string) error {
 	InstallDependencies(ext, folderPath)
 	gitInit(folderPath)
 
+	isDone <- true
 	return nil
 }

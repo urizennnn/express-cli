@@ -4,3 +4,4 @@ test.js
 .npmrc
 main
 .env
+vendor

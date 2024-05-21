@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	config "github.com/urizennnn/express-cli/functions/config"
-	"io"
-	"os"
-	"strings"
 )
 
 const listHeight = 14
@@ -17,8 +18,6 @@ var (
 	Preferences = config.User{
 		PackageManager: "",
 		Language:       "",
-		Injection:      "",
-		Database:       "",
 	}
 	number            = 0
 	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
@@ -56,17 +55,17 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	fmt.Fprint(w, fn(str))
 }
 
-type model struct {
+type Model struct {
 	list     list.Model
 	choice   string
 	quitting bool
 }
 
-func (m model) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
@@ -84,10 +83,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.choice = string(i)
 				m.input_Preferences(m.choice)
 				number++
-				List()
+				if number < len(UpdateTitleArray()) {
+					List()
+				} else {
+					config.CreateFolderAndWriteConfig(Preferences)
+					return m, tea.Quit
+				}
+			} else {
+				number++
+				if number < len(UpdateTitleArray()) {
+					List()
+				} else {
+					config.CreateFolderAndWriteConfig(Preferences)
+					return m, tea.Quit
+				}
 			}
-			config.CreateFolderAndWriteConfig(Preferences)
-			return m, tea.Quit
 		}
 	}
 
@@ -96,9 +106,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m Model) View() string {
 	if m.choice != "" {
-		return quitTextStyle.Render("")
+		return quitTextStyle.Render(m.choice)
 	}
 	if m.quitting {
 		return quitTextStyle.Render("Turning off generators...")
@@ -107,7 +117,15 @@ func (m model) View() string {
 }
 
 func List() {
+	if number == len(UpdateTitleArray()) {
+		return
+	}
+
 	items := UpdateList()
+	if items == nil {
+		return
+
+	}
 	const defaultWidth = 20
 
 	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
@@ -119,11 +137,7 @@ func List() {
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
 
-	m := model{list: l}
-	if number > 4 {
-		config.Spinner()
-		os.Exit(0)
-	}
+	m := Model{list: l}
 	if _, err := tea.NewProgram(m).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
@@ -131,13 +145,18 @@ func List() {
 }
 
 func UpdateTitle() (string, int) {
-	title := []string{"What package Manager do you want to use", "What language would you like to use", "What database would you like to use", "Would you like dependencies installed or fresh start"}
+	title := UpdateTitleArray()
 	length := len(title)
 	if number >= 0 && number < length {
 		return title[number], length
 	}
 	return "", length
 }
+
+func UpdateTitleArray() []string {
+	return []string{"What package Manager do you want to use", "What language would you like to use"}
+}
+
 func UpdateList() []list.Item {
 	lists_0 := []list.Item{
 		item("npm"),
@@ -150,29 +169,13 @@ func UpdateList() []list.Item {
 		item("TypeScript"),
 	}
 
-	lists_2 := []list.Item{
-		item("MongoDB"),
-		item("PostgreSQL"),
-		item("MySQL"),
-	}
-
-	lists_3 := []list.Item{
-		item("Yes"),
-		item("No, I want fresh start with no dependencies"),
-	}
-
 	switch number {
 	case 0:
 		return lists_0
 	case 1:
 		return lists_1
-	case 2:
-		return lists_2
-	case 3:
-		return lists_3
 	default:
 		return nil
-
 	}
 }
 
@@ -191,24 +194,13 @@ func Skip() {
 	}
 	lines := strings.Split(string(contents), "\n")
 	fmt.Println(lines)
-
 }
 
-func (m model) input_Preferences(i string) {
+func (m Model) input_Preferences(i string) {
 	switch number {
 	case 0:
 		Preferences.PackageManager = i
-		return
 	case 1:
 		Preferences.Language = i
-		return
-	case 2:
-		Preferences.Database = i
-		return
-	case 3:
-		Preferences.Injection = i
-		return
-	default:
-		return
 	}
 }

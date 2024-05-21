@@ -3,15 +3,12 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
-	"reflect"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/urizennnn/express-cli/errors"
 )
 
 var (
@@ -69,7 +66,8 @@ func CreateFolderAndWriteConfig(preferences User) {
 
 }
 
-func Spinner() {
+func Spinner(isDone chan bool) {
+	defer close(isDone)
 	m := model{}
 	m.resetSpinner()
 
@@ -77,6 +75,7 @@ func Spinner() {
 		fmt.Println("could not run program:", err)
 		os.Exit(1)
 	}
+	fmt.Println("\x1b[32;1mRunning Spinner\x1b[0m")
 }
 
 type model struct {
