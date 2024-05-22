@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/errors"
 	"github.com/urizennnn/express-cli/functions/cli"
-	"github.com/urizennnn/express-cli/process"
+	"github.com/urizennnn/express-cli/functions/config"
 )
 
 var Root string
@@ -17,7 +17,6 @@ var initCmd = &cobra.Command{
 	Short: "Build your express application.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		isDone := make(chan bool)
 		cwd, err := os.Getwd()
 		errors.Check_Err(err)
 		Root = cwd
@@ -32,11 +31,16 @@ var initCmd = &cobra.Command{
 		} else {
 			cli.List()
 			pre := cli.Preferences
-			fmt.Println(pre)
-			go process.CopyFilesToCWD(cwd, args[0], pre.Language, isDone)
-			fmt.Println("Building your express application...")
+			switch pre.Language {
+			case "JavaScript":
+				config.Run(cwd, args[0], "js")
+			case "TypeScript":
+				config.Run(cwd, args[0], "ts")
+			}
+
 		}
 
+		fmt.Println(config.Green + "Express application created successfully!" + config.Green)
 	},
 }
 
