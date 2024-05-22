@@ -1,0 +1,37 @@
+{
+  "name": "@urizen/express-cli",
+  "version": "2.0.1",
+  "license": "MIT",
+    "bin": {
+    "cli": "./main"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "chai": "^5.1.0",
+    "jest": "^29.7.0",
+    "mocha": "^10.4.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  },
+  "description": "A command line tool that scaffolds express application code in both javascript and typescript to speed up development experience. Inspired by nest js cli",
+  "main": "./packages/express-cli/cli/prompt.js",
+  "scripts": {
+    "build": "tsc -w",
+    "stash": "git stash ",
+    "preinstall": "node init.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urizennnn/express-cli.git"
+  },
+  "author": "Victor Akaaha",
+  "bugs": {
+    "url": "https://github.com/urizennnn/express-cli/issues"
+  },
+  "homepage": "https://github.com/urizennnn/express-cli#readme",
+  "keywords": [
+    "cli",
+    "express"
+  ]
+}
