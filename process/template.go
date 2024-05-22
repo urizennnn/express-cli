@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"context"
+	err "errors"
 
 	"github.com/urizennnn/express-cli/errors"
 )
@@ -71,7 +72,7 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	case "ts":
 		jointPath = "generator/TS"
 	default:
-		panic("Not Supported")
+		return err.New("Invalid extension")
 	}
 
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {

@@ -27,7 +27,13 @@ var initCmd = &cobra.Command{
 		}
 
 		if skipInit {
-			cli.Skip()
+			lines := cli.Skip()
+			switch lines.Language {
+			case "JavaScript":
+				config.Run(cwd, args[0], "js")
+			case "TypeScript":
+				config.Run(cwd, args[0], "ts")
+			}
 		} else {
 			cli.List()
 			pre := cli.Preferences

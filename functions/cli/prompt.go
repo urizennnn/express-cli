@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -108,7 +109,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	if m.choice != "" {
-		return quitTextStyle.Render(m.choice)
+		return quitTextStyle.Render("")
 	}
 	if m.quitting {
 		return quitTextStyle.Render("Turning off generators...")
@@ -179,7 +180,7 @@ func UpdateList() []list.Item {
 	}
 }
 
-func Skip() {
+func Skip() config.User {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println(err)
@@ -192,8 +193,9 @@ func Skip() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	lines := strings.Split(string(contents), "\n")
-	fmt.Println(lines)
+	var lines config.User
+	json.Unmarshal(contents, &lines)
+	return lines
 }
 
 func (m Model) input_Preferences(i string) {
