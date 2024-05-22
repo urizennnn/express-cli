@@ -2,13 +2,13 @@ package process
 
 import (
 	"embed"
-	err "errors"
 	"io/fs"
 	"os"
 	"path/filepath"
 
+	"context"
+
 	"github.com/urizennnn/express-cli/errors"
-	"github.com/urizennnn/express-cli/functions/config"
 )
 
 //go:embed all:generator
@@ -57,8 +57,8 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	return nil
 }
 
-func CopyFilesToCWD(cwd, name, ext string, isDone chan bool) error {
-	go config.Spinner(isDone)
+func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
+	defer ctx()
 	folderPath := filepath.Join(cwd, name)
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
 		errors.Check_Err(err)
@@ -66,12 +66,12 @@ func CopyFilesToCWD(cwd, name, ext string, isDone chan bool) error {
 
 	var jointPath string
 	switch ext {
-	case "JavaScript":
+	case "js":
 		jointPath = "generator/JS"
-	case "TypeScript":
+	case "ts":
 		jointPath = "generator/TS"
 	default:
-		return err.New("unsupported extension")
+		panic("Not Supported")
 	}
 
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {
@@ -81,6 +81,5 @@ func CopyFilesToCWD(cwd, name, ext string, isDone chan bool) error {
 	InstallDependencies(ext, folderPath)
 	gitInit(folderPath)
 
-	isDone <- true
 	return nil
 }
