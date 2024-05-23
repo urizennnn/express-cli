@@ -2,11 +2,13 @@ const os = require('os');
 const platform = os.platform();
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const pathtoFile = path.join(__dirname, 'package.json');
 const fileContent = fs.readFileSync(pathtoFile, 'utf8');
 const packageJson = JSON.parse(fileContent);
-console.log("We are trying to get what OS you use.")
+
+execSync('go build main.go', { stdio: 'inherit', windowsHide: true });
 
 if (platform === 'win32') {
     packageJson.bin.cli = './main';
