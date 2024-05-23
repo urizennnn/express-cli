@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,22 +10,22 @@ import (
 	"github.com/urizennnn/express-cli/functions/config"
 )
 
-//go:embed version.js
-var version embed.FS
+var RootDir string
 
 var rootCmd = &cobra.Command{
 	Use:   "cli",
 	Short: "",
 	Long:  `Express CLI is a command line tool for Express.js.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+		RootDir, err = getRootDir()
+		errors.Check_Err(err)
+
 		flags, err := cmd.Flags().GetBool("v")
 		errors.Check_Err(err)
+
 		if flags {
-			out, err := exec.Command("node", "version.js").Output()
-			if err != nil {
-				errors.Check_Err(err)
-			}
-			fmt.Print("Express cli is at version " + config.Green + string(out) + config.Green)
+			printVersion()
 		}
 	},
 }
@@ -37,4 +36,23 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func getRootDir() (string, error) {
+	if os.Getenv("PLATFORM") == "windows" {
+		return os.Getenv("USERPROFILE") + "\\AppData\\Roaming\\npm\\node_modules\\@urizen\\express-cli", nil
+	}
+	return "/usr/lib/node_modules/@urizen/express-cli", nil
+}
+
+func printVersion() {
+	// versionFile, err := os.ReadDir(RootDir)
+	// errors.Check_Err(err)
+	data, err := getRootDir()
+	errors.Check_Err(err)
+	file := data + "/version.js"
+	out, err := exec.Command("node", file).Output()
+	errors.Check_Err(err)
+
+	fmt.Print("Express CLI is at version " + config.Green + string(out) + config.Green)
 }
