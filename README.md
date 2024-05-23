@@ -5,7 +5,7 @@ We are excited to announce a major update to our application, now rewritten enti
 
 ## Command Line Interface (CLI)
 The CLI has been redesigned with a new streamlined command for initializing projects:
-```cli init <folder-name>```
+```express init <folder-name>```
 This will create a new application with default dependencies pre-installed for an Express application, as well as an initialized Git repository.
 
 ## Flags
@@ -23,8 +23,8 @@ This application at the moment does not support windows out the box but you can 
 
 
 ### Building for Windows
-To build the application for Windows, you will need to have Go installed on your machine. You can download Go from the official website: https://go.dev/doc/install. You should then install the npm package as usual via the ```npm install -g @urizen/express-cli``` command, and then when it is installed you should go to your env variables and add the path and alias it to ```cli``` to your PATH variable.
-This would allow you to run the command ```cli``` in your terminal to use the application.
+To build the application for Windows, you will need to have Go installed on your machine. You can download Go from the official website: https://go.dev/doc/install. You should then install the npm package as usual via the ```npm install -g @urizen/express-cli``` command, and then when it is installed you should go to your env variables and add the path and alias it to ```express``` to your PATH variable.
+This would allow you to run the command ```express``` in your terminal to use the application.
 
 ## Support
 If you encounter any issues or have suggestions for improvements, please open an issue on our repository. We value your feedback and are committed to providing a seamless development experience.
