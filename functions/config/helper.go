@@ -17,6 +17,8 @@ import (
 	"github.com/urizennnn/express-cli/process"
 )
 
+var quitTextStyle = lipgloss.NewStyle().Margin(1, 0, 2, 4)
+
 type errMsg error
 
 type model struct {
@@ -70,10 +72,10 @@ func (m model) View() string {
 		return m.err.Error()
 	}
 
-	str := fmt.Sprintf("%s Loading...\n", m.spinner.View())
+	str := fmt.Sprintf("%s Compiling...\n", m.spinner.View())
 
 	if m.quitting {
-		return str + "\n"
+		os.Exit(1)
 	}
 	return str
 }
@@ -101,10 +103,8 @@ func Run(cwd, DirName, language string) int {
 		defer wg.Done()
 		defer cancel()
 
-		// Create spinner.
 		p := tea.NewProgram(initialModel(), tea.WithContext(ctx), tea.WithoutSignalHandler())
 
-		// Run until context is cancelled os quit message is received.
 		_, err := p.Run()
 		if err != nil && !errors.Is(err, tea.ErrProgramKilled) {
 			panic(err)
@@ -112,10 +112,9 @@ func Run(cwd, DirName, language string) int {
 	}()
 
 	// You can do other things here...
-
-	// Wait for both goroutines.
 	wg.Wait()
 
+	fmt.Println(Green + "Express application created successfully!" + Green)
 	return 0
 }
 

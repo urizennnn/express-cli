@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,7 +19,6 @@ var initCmd = &cobra.Command{
 		cwd, err := os.Getwd()
 		errors.Check_Err(err)
 		Root = cwd
-		fmt.Println("Current working directory: ", cwd)
 		skipInit, err := cmd.Flags().GetBool("y")
 		if err != nil {
 			panic(err)
@@ -46,7 +44,6 @@ var initCmd = &cobra.Command{
 
 		}
 
-		fmt.Println(config.Green + "Express application created successfully!" + config.Green)
 	},
 }
 

@@ -112,7 +112,7 @@ func (m Model) View() string {
 		return quitTextStyle.Render("")
 	}
 	if m.quitting {
-		return quitTextStyle.Render("Turning off generators...")
+		return quitTextStyle.Render(config.Red + "Turning off generators..." + config.Red)
 	}
 	return "\n" + m.list.View()
 }
