@@ -23,11 +23,11 @@ This application at the moment does not support windows out the box but you can 
 
 
 ### Building for Windows
-To build the application for Windows, you will need to have Go installed on your machine. You can download Go from the official website: https://go.dev/doc/install. You should then install the npm package as usual via the ```npm install -g @urizen/express-cli``` command, and then when it is installed you should go to your env variables and add the path and alias it to ```express``` to your PATH variable.
-This would allow you to run the command ```express``` in your terminal to use the application.
+You would have to find where npm stores it's installed package which is like in ```Users/<username>/AppData/Roaming/npm/node_modules/@urizen``` there woulda file in there called windows. Copy the path to that file/folder and add to your PATH variable with the name ```express```.
 
 ## Support
 If you encounter any issues or have suggestions for improvements, please open an issue on our repository. We value your feedback and are committed to providing a seamless development experience.
 Thank you for your continued support!
 
-**Full Changelog**: https://github.com/urizennnn/express-cli/compare/v1.4.10...v2.0.0
+**Full Changelog**: https://github.com/urizennnn/express-cli/compare/v1.4.10...v2.1.4
+

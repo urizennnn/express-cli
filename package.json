@@ -1,10 +1,9 @@
 {
   "name": "@urizen/express-cli",
-  "version": "2.1.4",
+  "version": "2.1.9",
   "license": "MIT",
   "bin": {
-    "express": "./main",
-    "cli": "main"
+    "express": "main"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
