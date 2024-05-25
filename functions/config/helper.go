@@ -111,7 +111,6 @@ func Run(cwd, DirName, language string) int {
 		}
 	}()
 
-	// You can do other things here...
 	wg.Wait()
 
 	fmt.Println(Green + "Express application created successfully!" + Green)

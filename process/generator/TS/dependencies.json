@@ -1,6 +1,7 @@
 {
     "dependencies": [
         "dotenv",
+        "nodemon",
         "express",
         "http-status-codes",
         "morgan",

@@ -10,6 +10,7 @@ import (
 	err "errors"
 
 	"github.com/urizennnn/express-cli/errors"
+	"github.com/urizennnn/express-cli/lib"
 )
 
 //go:embed all:generator
@@ -64,6 +65,7 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
 		errors.Check_Err(err)
 	}
+	npmInit(folderPath)
 
 	var jointPath string
 	switch ext {
@@ -81,6 +83,16 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 
 	InstallDependencies(ext, folderPath)
 	gitInit(folderPath)
+	var language string
+	switch ext {
+	case "js":
+		language = "JavaScript"
+	case "ts":
+		language = "TypeScript"
+	default:
+		return err.New("Invalid extension")
+	}
+	defer lib.JsonScripts(folderPath, language)
 
 	return nil
 }

@@ -10,16 +10,12 @@ import (
 	"os/exec"
 )
 
-var RootDir string
-
-// versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Return the version the cli-tool installed",
 	Long:  `Return the version the cli-tool installed`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var err error
-		RootDir, err = getRootDir()
 		errors.Check_Err(err)
 		printVersion()
 	},
@@ -30,18 +26,22 @@ func init() {
 
 }
 func getRootDir() (string, error) {
-	if os.Getenv("PLATFORM") == "windows" {
+	if os.Getenv("PLATFORM") == "win32" {
 		return os.Getenv("USERPROFILE") + "\\AppData\\Roaming\\npm\\node_modules\\@urizen\\express-cli", nil
 	}
 	return "/usr/lib/node_modules/@urizen/express-cli", nil
 }
 
 func printVersion() {
-	// versionFile, err := os.ReadDir(RootDir)
-	// errors.Check_Err(err)
 	data, err := getRootDir()
 	errors.Check_Err(err)
-	file := data + "/version.js"
+	var file string
+	if os.Getenv("PLATFORM") == "win32" {
+		file = data + "\\version.js"
+	} else {
+		file = data + "/version.js"
+	}
+
 	out, err := exec.Command("node", file).Output()
 	errors.Check_Err(err)
 

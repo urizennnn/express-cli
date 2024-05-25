@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	Err "errors"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/errors"
@@ -16,12 +18,24 @@ var initCmd = &cobra.Command{
 	Short: "Build your express application.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			errors.Check_Err(Err.New(config.Red + "No arguments provided" + config.Red))
+			errors.Check_Err(Err.New(config.Red + "Turning off generators..." + config.Red))
+			time.Sleep(3 * time.Second)
+			return
+		}
+
 		cwd, err := os.Getwd()
-		errors.Check_Err(err)
+		if err != nil {
+			errors.Check_Err(err)
+			return
+		}
 		Root = cwd
+
 		skipInit, err := cmd.Flags().GetBool("y")
 		if err != nil {
-			panic(err)
+			errors.Check_Err(err)
+			return
 		}
 
 		if skipInit {
@@ -31,6 +45,9 @@ var initCmd = &cobra.Command{
 				config.Run(cwd, args[0], "js")
 			case "TypeScript":
 				config.Run(cwd, args[0], "ts")
+			default:
+				errors.Check_Err(Err.New("unsupported language"))
+				return
 			}
 		} else {
 			cli.List()
@@ -40,10 +57,11 @@ var initCmd = &cobra.Command{
 				config.Run(cwd, args[0], "js")
 			case "TypeScript":
 				config.Run(cwd, args[0], "ts")
+			default:
+				errors.Check_Err(Err.New("unsupported language"))
+				return
 			}
-
 		}
-
 	},
 }
 

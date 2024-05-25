@@ -19,11 +19,7 @@ The process for creating a new application has changed, as described above.
 Database and dependency selection has been removed from the initialization process to simplify the workflow.
 
 ## Windows Support 
-This application at the moment does not support windows out the box but you can build it to support windows by following the steps below:
-
-
-### Building for Windows
-You would have to find where npm stores it's installed package which is like in ```Users/<username>/AppData/Roaming/npm/node_modules/@urizen``` there woulda file in there called windows. Copy the path to that file/folder and add to your PATH variable with the name ```express```.
+Available for Windows users, the CLI can now be used on Windows machines to create and manage Express applications.
 
 ## Support
 If you encounter any issues or have suggestions for improvements, please open an issue on our repository. We value your feedback and are committed to providing a seamless development experience.

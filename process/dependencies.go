@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"os"
 	"os/exec"
 
 	"github.com/urizennnn/express-cli/errors"
@@ -22,6 +23,7 @@ func InstallDependencies(ext, cwd string) {
 		jointPath = "generator/TS"
 	default:
 		fmt.Println("Unsupported extension")
+		os.Exit(1)
 		return
 	}
 	const targetFile = "dependencies.json"
@@ -56,6 +58,12 @@ func InstallDependencies(ext, cwd string) {
 
 func gitInit(cwd string) {
 	commad := exec.Command("git", "init")
+	commad.Dir = cwd
+	err := commad.Run()
+	errors.Check_Err(err)
+}
+func npmInit(cwd string) {
+	commad := exec.Command("npm", "init", "-y")
 	commad.Dir = cwd
 	err := commad.Run()
 	errors.Check_Err(err)
