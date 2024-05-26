@@ -4,7 +4,7 @@ import (
 	"embed"
 	"io/fs"
 	"os"
-	"path/filepath"
+	"path"
 
 	"context"
 	err "errors"
@@ -20,7 +20,7 @@ func CopyFile(srcPath, destPath string, fsys embed.FS) error {
 	input, err := fsys.ReadFile(srcPath)
 	errors.Check_Err(err)
 
-	err = os.MkdirAll(filepath.Dir(destPath), 0755)
+	err = os.MkdirAll(path.Dir(destPath), 0755)
 	errors.Check_Err(err)
 
 	err = os.WriteFile(destPath, input, 0644)
@@ -32,13 +32,13 @@ func CopyFile(srcPath, destPath string, fsys embed.FS) error {
 func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error {
 	entries, err := fs.ReadDir(fsys, srcPath)
 	if err != nil {
-		return err
+		errors.Check_Err(err)
 	}
 
 	for _, entry := range entries {
-		oldPath := filepath.Join(srcPath, entry.Name())
-		newPath := filepath.Join(destPath, entry.Name())
-
+		oldPath := path.Join(srcPath, entry.Name())
+		newPath := path.Join(destPath, entry.Name())
+	
 		if entry.IsDir() {
 			if err := copyDirRecursive(oldPath, newPath, fsys, ext); err != nil {
 				return err
@@ -61,7 +61,7 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 
 func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	defer ctx()
-	folderPath := filepath.Join(cwd, name)
+	folderPath := path.Join(cwd, name)
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
 		errors.Check_Err(err)
 	}
@@ -74,7 +74,7 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	case "ts":
 		jointPath = "generator/TS"
 	default:
-		return err.New("Invalid extension")
+		return err.New("invalid extension")
 	}
 
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {
@@ -90,7 +90,7 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	case "ts":
 		language = "TypeScript"
 	default:
-		return err.New("Invalid extension")
+		return err.New("invalid extension")
 	}
 	defer lib.JsonScripts(folderPath, language)
 

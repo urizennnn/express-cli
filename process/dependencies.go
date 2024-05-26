@@ -47,6 +47,7 @@ func InstallDependencies(ext, cwd string) {
 					commad := exec.Command("npm", "install", dep)
 					commad.Dir = cwd
 					err = commad.Run()
+					errors.Check_Err(err)
 				}
 				return
 			}
