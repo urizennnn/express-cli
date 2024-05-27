@@ -14,10 +14,10 @@ const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 // Path to .env file
-const envFilePath = path.join(__dirname, '.env');
+const goFilePath = path.join(__dirname, 'cmd', 'platform.go');
 
 // Write platform to .env file
-fs.writeFile(envFilePath, `PLATFORM="${platform}"\n`, (err) => {
+fs.writeFile(goFilePath, `package cmd\nvar PLATFORM="${platform}"\n`, (err) => {
     if (err) {
         console.error('Error writing to .env file:', err);
     } else {
