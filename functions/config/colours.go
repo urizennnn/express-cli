@@ -9,4 +9,5 @@ const (
 	Magenta = "\033[35m"
 	Cyan    = "\033[36m"
 	Bold    = "\033[1m"
+	Grey    = "\033[90m"
 )

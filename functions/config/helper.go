@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"sync"
-	"syscall"
-
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/urizennnn/express-cli/process"
+	"golang.org/x/term"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"strings"
+	"sync"
+	"syscall"
 )
 
 var quitTextStyle = lipgloss.NewStyle().Margin(1, 0, 2, 4)
@@ -38,82 +39,61 @@ func (m model) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(message tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := message.(type) {
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q", "esc", "ctrl+c":
+		if msg.String() == "q" || msg.String() == "esc" || msg.String() == "ctrl+c" {
 			m.quitting = true
 			return m, tea.Quit
-		default:
-			return m, nil
 		}
-
 	case errMsg:
 		m.err = msg
-
-		return m, nil
-
 	case spinner.TickMsg:
 		var cmd tea.Cmd
-
 		m.spinner, cmd = m.spinner.Update(msg)
-
 		return m, cmd
-
-	default:
-		return m, nil
 	}
-
+	return m, nil
 }
 
 func (m model) View() string {
 	if m.err != nil {
 		return m.err.Error()
 	}
-
-	str := fmt.Sprintf("%s Compiling...\n", m.spinner.View())
-
 	if m.quitting {
 		os.Exit(1)
 	}
-	return str
+	return fmt.Sprintf("%s Compiling...\n", m.spinner.View())
 }
 
 func Run(cwd, DirName, language string) int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	wg := sync.WaitGroup{}
+	var wg sync.WaitGroup
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer cancel()
-
 		process.CopyFilesToCWD(cwd, DirName, language, cancel)
-		select {
-		case <-ctx.Done():
-			return
-		}
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer cancel()
-
 		p := tea.NewProgram(initialModel(), tea.WithContext(ctx), tea.WithoutSignalHandler())
-
-		_, err := p.Run()
-		if err != nil && !errors.Is(err, tea.ErrProgramKilled) {
+		if _, err := p.Run(); err != nil && !errors.Is(err, tea.ErrProgramKilled) {
 			panic(err)
 		}
 	}()
 
 	wg.Wait()
 
-	fmt.Println(Green + "Express application created successfully!" + Green)
+	fmt.Println(Green + "Express application created successfully!" + Reset)
+	instructionsToRun(DirName)
+	writeToTerm()
 	return 0
 }
 
@@ -127,8 +107,7 @@ func CreateFolderAndWriteConfig(preferences User) {
 	folderPath := filepath.Join(userProfile, ".express-cli")
 	filePath := filepath.Join(folderPath, ".express.config.json")
 
-	err = os.MkdirAll(folderPath, 0755)
-	if err != nil {
+	if err = os.MkdirAll(folderPath, 0755); err != nil {
 		fmt.Printf("\x1b[31;4mError creating folder: %v\x1b[0m\n", err)
 		return
 	}
@@ -146,10 +125,29 @@ func CreateFolderAndWriteConfig(preferences User) {
 		return
 	}
 
-	_, err = file.Write(jsonData)
-	if err != nil {
+	if _, err = file.Write(jsonData); err != nil {
 		fmt.Printf("\x1b[31;4mError writing to file: %v\x1b[0m\n", err)
+	}
+}
+
+func writeToTerm() {
+	str := "Thank you for using Express CLI! \nPlease don't forget to star the repository on GitHub! \nReach out to us on the issues page if you have any questions or suggestions. \nEnjoy your prebuilt Express application!"
+
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		fmt.Println("Error getting terminal size:", err)
 		return
 	}
 
+	lines := strings.Split(str, "\n")
+	for _, line := range lines {
+		padding := (width - len(line)) / 2
+		paddedLine := strings.Repeat(" ", padding) + line
+		fmt.Println(Yellow + paddedLine + Reset)
+	}
+}
+
+func instructionsToRun(packageName string) {
+	fmt.Printf(Grey+" $  cd %s\n"+Reset, packageName)
+	fmt.Println(Grey + " $  npm start" + Reset)
 }
