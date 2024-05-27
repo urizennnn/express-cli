@@ -29,7 +29,7 @@ func init() {
 
 }
 func getRootDir() (string, error) {
-	if PLATFORM == "win32" {
+	if PLATFORM == "windows" {
 		return os.Getenv("USERPROFILE") + "\\AppData\\Roaming\\npm\\node_modules\\@urizen\\express-cli", nil
 	}
 	return "/usr/lib/node_modules/@urizen/express-cli", nil
@@ -39,7 +39,7 @@ func printVersion() {
 	data, err := getRootDir()
 	errors.Check_Err(err)
 	var file string
-	if PLATFORM == "win32" {
+	if PLATFORM == "windows" {
 		file = data + "\\version.js"
 	} else {
 		file = data + "/version.js"

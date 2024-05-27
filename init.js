@@ -13,18 +13,6 @@ const packageJsonPath = path.join(__dirname, 'package.json');
 // Read package.json
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-// Path to .env file
-const goFilePath = path.join(__dirname, 'cmd', 'platform.go');
-
-// Write platform to .env file
-fs.writeFile(goFilePath, `package cmd\nvar PLATFORM="${platform}"\n`, (err) => {
-    if (err) {
-        console.error('Error writing to .env file:', err);
-    } else {
-        console.log('.env file has been updated');
-    }
-});
-
 // Set the bin field based on the OS
 if (isWindows) {
     packageJson.bin = { "express": "windows.exe" };
