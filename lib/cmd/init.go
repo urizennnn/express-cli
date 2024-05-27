@@ -2,7 +2,6 @@ package cmd
 
 import (
 	Err "errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -13,13 +12,13 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:   "init",
+	Use:   "init [app_name]",
 	Short: "Build your express application.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			errors.Check_Err(Err.New(config.Red + "No arguments provided" + config.Red))
-			errors.Check_Err(Err.New(config.Red + "Turning off generators..." + config.Red))
+			errors.Check_Err(Err.New(config.Red + "No arguments provided" + config.Reset))
+			errors.Check_Err(Err.New(config.Red + "Turning off generators..." + config.Reset))
 			cmd.Help()
 			time.Sleep(3 * time.Second)
 			return
@@ -53,7 +52,6 @@ var initCmd = &cobra.Command{
 			pre := cli.Preferences
 			switch pre.Language {
 			case "JavaScript":
-				fmt.Println("JavaScript")
 				config.Run(cwd, args[0], pre.PackageManager, "js")
 			case "TypeScript":
 				config.Run(cwd, args[0], pre.PackageManager, "ts")

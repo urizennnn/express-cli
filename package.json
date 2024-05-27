@@ -1,9 +1,9 @@
 {
   "name": "@urizen/express-cli",
-  "version": "2.2.28",
+  "version": "2.3.28",
   "license": "MIT",
   "bin": {
-    "express": "bin/linux"
+    "express": "bin/windows.exe"
   },
   "description": "A command line tool that scaffolds express application code in both javascript and typescript to speed up development experience. Inspired by nest js cli",
   "main": "./packages/express-cli/cli/prompt.js",
