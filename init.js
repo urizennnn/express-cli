@@ -15,11 +15,11 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 // Set the bin field based on the OS
 if (isWindows) {
-    packageJson.bin = { "express": "windows.exe" };
+    packageJson.bin = { "express": "bin/windows.exe" };
 } else if (isLinux) {
-    packageJson.bin = { "express": "linux" };
+    packageJson.bin = { "express": "bin/linux" };
 } else if (isMac) {
-    packageJson.bin = { "express": "linux" };
+    packageJson.bin = { "express": "bin/linux" };
 }
 
 // Write the modified package.json back to disk

@@ -5,17 +5,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/urizennnn/express-cli/process"
-	"golang.org/x/term"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
+	"time"
+
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/urizennnn/express-cli/lib/process"
+	"golang.org/x/term"
 )
 
 var quitTextStyle = lipgloss.NewStyle().Margin(1, 0, 2, 4)
@@ -66,7 +68,8 @@ func (m model) View() string {
 	return fmt.Sprintf("%s Compiling...\n", m.spinner.View())
 }
 
-func Run(cwd, DirName, language string) int {
+func Run(cwd, DirName, manager, language string) int {
+	start := time.Now()
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
@@ -76,7 +79,7 @@ func Run(cwd, DirName, language string) int {
 	go func() {
 		defer wg.Done()
 		defer cancel()
-		process.CopyFilesToCWD(cwd, DirName, language, cancel)
+		process.CopyFilesToCWD(cwd, DirName, manager, language, cancel)
 	}()
 
 	wg.Add(1)
@@ -90,8 +93,11 @@ func Run(cwd, DirName, language string) int {
 	}()
 
 	wg.Wait()
-
+	end := time.Now()
+	duration := end.Sub(start)
+	finalDuration := duration.Truncate(time.Second)
 	fmt.Println(Green + "Express application created successfully!" + Reset)
+	fmt.Printf("✨ Operation took  %v\n", finalDuration)
 	instructionsToRun(DirName)
 	writeToTerm()
 	return 0

@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/urizennnn/express-cli/functions/config"
+	"github.com/urizennnn/express-cli/lib/functions/config"
 )
 
 const listHeight = 14

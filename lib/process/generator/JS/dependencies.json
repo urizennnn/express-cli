@@ -1,12 +1,14 @@
 {
     "dependencies": [
         "dotenv",
-        "nodemon",
         "express",
         "http-status-codes",
         "morgan",
         "cors",
-        "eslint",
+        "eslint"
+    ],
+    "dev":[
+        "nodemon",
         "prettier"
     ]
 }

@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/errors"
-	"github.com/urizennnn/express-cli/functions/config"
+	"github.com/urizennnn/express-cli/lib/functions/config"
 )
 
 var versionCmd = &cobra.Command{

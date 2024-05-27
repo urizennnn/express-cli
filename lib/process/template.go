@@ -2,6 +2,7 @@ package process
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"os"
 	"path"
@@ -10,7 +11,7 @@ import (
 	err "errors"
 
 	"github.com/urizennnn/express-cli/errors"
-	"github.com/urizennnn/express-cli/lib"
+	scripts "github.com/urizennnn/express-cli/lib/Scripts"
 )
 
 //go:embed all:generator
@@ -38,7 +39,7 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	for _, entry := range entries {
 		oldPath := path.Join(srcPath, entry.Name())
 		newPath := path.Join(destPath, entry.Name())
-	
+
 		if entry.IsDir() {
 			if err := copyDirRecursive(oldPath, newPath, fsys, ext); err != nil {
 				return err
@@ -59,13 +60,19 @@ func copyDirRecursive(srcPath, destPath string, fsys embed.FS, ext string) error
 	return nil
 }
 
-func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
+func CopyFilesToCWD(cwd, name, manager, ext string, ctx context.CancelFunc) error {
 	defer ctx()
 	folderPath := path.Join(cwd, name)
+	fileCheck := checkFileExists(folderPath)
+	if fileCheck {
+		fmt.Println("\033[31m" + "folder already exists" + "\033[0m")
+		os.Exit(1)
+	}
 	if err := os.MkdirAll(folderPath, 0755); err != nil {
 		errors.Check_Err(err)
 	}
-	npmInit(folderPath)
+	fmt.Printf("This is manager %v", manager)
+	managerInit(folderPath, manager)
 
 	var jointPath string
 	switch ext {
@@ -80,8 +87,7 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {
 		errors.Check_Err(err)
 	}
-
-	InstallDependencies(ext, folderPath)
+	InstallDependenciesUnix(ext, manager, folderPath)
 	gitInit(folderPath)
 	var language string
 	switch ext {
@@ -92,7 +98,16 @@ func CopyFilesToCWD(cwd, name, ext string, ctx context.CancelFunc) error {
 	default:
 		return err.New("invalid extension")
 	}
-	defer lib.JsonScripts(folderPath, language)
+	defer scripts.JsonScripts(folderPath, language)
 
 	return nil
+}
+
+func checkFileExists(filePath string) bool {
+	if _, err := os.Stat(filePath); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }

@@ -1,0 +1,26 @@
+{
+    "dependencies": [
+        "dotenv",
+        "ts-node",
+        "nodemon",
+        "express",
+        "http-status-codes",
+        "morgan",
+        "cors",
+        "eslint",
+        "typescript",
+        "prettier"
+    ],
+    "dev":[
+        "@types/node",
+        "@types/express",
+        "@types/morgan",
+        "@types/cors",
+        "@typescript-eslint/parser",
+        "@typescript-eslint/eslint-plugin",
+        "eslint-config-prettier",
+        "eslint-plugin-prettier",
+        "prettier"
+    ]
+}
+

@@ -21,7 +21,7 @@ EXIT /b
 :start
 SETLOCAL
 CALL :find_dp0
-"%dp0%\\node_modules\\@urizen\\express-cli\\${MAIN_FILE}" %*`;
+"%dp0%\\node_modules\\@urizen\\express-cli\\bin\\${MAIN_FILE}" %*`;
 
     const pwshFileContent = `#!/usr/bin/env pwsh
 
@@ -36,9 +36,9 @@ if ($PSVersionTable.PSVersion -lt "6.0" -or $IsWindows) {
 
 # Support pipeline input
 if ($MyInvocation.ExpectingInput) {
-  $input | & "$basedir/node_modules/@urizen/express-cli/${MAIN_FILE}" $args
+  $input | & "$basedir/node_modules/@urizen/express-cli/bin/${MAIN_FILE}" $args
 } else {
-  & "$basedir/node_modules/@urizen/express-cli/${MAIN_FILE}" $args
+  & "$basedir/node_modules/@urizen/express-cli/bin/${MAIN_FILE}" $args
 }
 
 exit $LASTEXITCODE`;
@@ -54,7 +54,7 @@ case uname in
     ;;
 esac
 
-exec "$basedir/node_modules/@urizen/express-cli/${MAIN_FILE}"   "$@"`
+exec "$basedir/node_modules/@urizen/express-cli/bin/${MAIN_FILE}"   "$@"`
 
     fs.writeFile(BATCH_FILE, batchFileContent, 'utf8', (err) => {
         if (err) {

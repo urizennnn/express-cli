@@ -2,16 +2,15 @@ package cmd
 
 import (
 	Err "errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/errors"
-	"github.com/urizennnn/express-cli/functions/cli"
-	"github.com/urizennnn/express-cli/functions/config"
+	"github.com/urizennnn/express-cli/lib/cli"
+	"github.com/urizennnn/express-cli/lib/functions/config"
 )
-
-var Root string
 
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -21,6 +20,7 @@ var initCmd = &cobra.Command{
 		if len(args) == 0 {
 			errors.Check_Err(Err.New(config.Red + "No arguments provided" + config.Red))
 			errors.Check_Err(Err.New(config.Red + "Turning off generators..." + config.Red))
+			cmd.Help()
 			time.Sleep(3 * time.Second)
 			return
 		}
@@ -30,7 +30,6 @@ var initCmd = &cobra.Command{
 			errors.Check_Err(err)
 			return
 		}
-		Root = cwd
 
 		skipInit, err := cmd.Flags().GetBool("y")
 		if err != nil {
@@ -42,9 +41,9 @@ var initCmd = &cobra.Command{
 			lines := cli.Skip()
 			switch lines.Language {
 			case "JavaScript":
-				config.Run(cwd, args[0], "js")
+				config.Run(cwd, args[0], lines.PackageManager, "js")
 			case "TypeScript":
-				config.Run(cwd, args[0], "ts")
+				config.Run(cwd, args[0], lines.PackageManager, "ts")
 			default:
 				errors.Check_Err(Err.New("unsupported language"))
 				return
@@ -54,12 +53,10 @@ var initCmd = &cobra.Command{
 			pre := cli.Preferences
 			switch pre.Language {
 			case "JavaScript":
-				config.Run(cwd, args[0], "js")
+				fmt.Println("JavaScript")
+				config.Run(cwd, args[0], pre.PackageManager, "js")
 			case "TypeScript":
-				config.Run(cwd, args[0], "ts")
-			default:
-				errors.Check_Err(Err.New("unsupported language"))
-				return
+				config.Run(cwd, args[0], pre.PackageManager, "ts")
 			}
 		}
 	},
