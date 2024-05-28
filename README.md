@@ -1,4 +1,4 @@
-# Version 2.2 Release Notes
+# Version 2.3 Release Notes
 We are excited to announce a major update to our application, now rewritten entirely in Go to take advantage of its performance and cross-platform compiled binaries.
 
 ### New Features
@@ -25,5 +25,5 @@ Available for Windows users, the CLI can now be used on Windows machines to crea
 If you encounter any issues or have suggestions for improvements, please open an issue on our repository. We value your feedback and are committed to providing a seamless development experience.
 Thank you for your continued support!
 
-**Full Changelog**: https://github.com/urizennnn/express-cli/compare/v1.4.10...v2.2.28
+**Full Changelog**: https://github.com/urizennnn/express-cli/compare/v1.4.10...v2.3.2
 
