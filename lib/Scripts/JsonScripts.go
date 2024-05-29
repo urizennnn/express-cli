@@ -30,7 +30,7 @@ func JsonScripts(cwd, ext string) {
 		if file.IsDir() {
 			continue
 		} else if file.Name() == "package.json" {
-			filePath := filepath.Join(cwd, "package.json")
+			filePath := filepath.Join(cwd, filepath.Clean("package.json"))
 			fileContent, err := os.ReadFile(filePath)
 			if err != nil {
 				errors.Check_Err(err)
@@ -58,7 +58,7 @@ func JsonScripts(cwd, ext string) {
 				os.Exit(1)
 			}
 
-			err = os.WriteFile(filePath, updatedContent, 0644)
+			err = os.WriteFile(filePath, updatedContent, 0600)
 			if err != nil {
 				errors.Check_Err(err)
 				os.Exit(1)

@@ -21,10 +21,10 @@ func CopyFile(srcPath, destPath string, fsys embed.FS) error {
 	input, err := fsys.ReadFile(srcPath)
 	errors.Check_Err(err)
 
-	err = os.MkdirAll(path.Dir(destPath), 0755)
+	err = os.MkdirAll(path.Dir(destPath), 0750)
 	errors.Check_Err(err)
 
-	err = os.WriteFile(destPath, input, 0644)
+	err = os.WriteFile(destPath, input, 0600)
 	errors.Check_Err(err)
 
 	return nil
@@ -68,7 +68,7 @@ func CopyFilesToCWD(cwd, name, manager, ext string, ctx context.CancelFunc) erro
 		fmt.Println("\033[31m" + "folder already exists" + "\033[0m")
 		os.Exit(1)
 	}
-	if err := os.MkdirAll(folderPath, 0755); err != nil {
+	if err := os.MkdirAll(folderPath, 0750); err != nil {
 		errors.Check_Err(err)
 	}
 	fmt.Printf("This is manager %v", manager)
@@ -87,7 +87,7 @@ func CopyFilesToCWD(cwd, name, manager, ext string, ctx context.CancelFunc) erro
 	if err := copyDirRecursive(jointPath, folderPath, TemplateDir, ext); err != nil {
 		errors.Check_Err(err)
 	}
-	InstallDependenciesUnix(ext, manager, folderPath)
+	InstallDependencies(ext, manager, folderPath)
 	gitInit(folderPath)
 	var language string
 	switch ext {

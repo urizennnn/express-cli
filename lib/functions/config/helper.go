@@ -112,12 +112,13 @@ func CreateFolderAndWriteConfig(preferences User) {
 	folderPath := filepath.Join(userProfile, ".express-cli")
 	filePath := filepath.Join(folderPath, ".express.config.json")
 
-	if err = os.MkdirAll(folderPath, 0755); err != nil {
+	if err = os.MkdirAll(folderPath, 0750); err != nil {
 		fmt.Printf("\x1b[31;4mError creating folder: %v\x1b[0m\n", err)
 		return
 	}
 
-	file, err := os.Create(filePath)
+	sanitizedFilePath := filepath.Clean(filePath)
+	file, err := os.Create(sanitizedFilePath)
 	if err != nil {
 		fmt.Printf("\x1b[31;4mError creating file: %v\x1b[0m\n", err)
 		return

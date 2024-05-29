@@ -3,15 +3,15 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
-	"strings"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/urizennnn/express-cli/errors"
 	"github.com/urizennnn/express-cli/lib/functions/config"
+	"io"
+	"os"
+	p "path/filepath"
+	"strings"
 )
 
 const listHeight = 14
@@ -189,7 +189,8 @@ func Skip() config.User {
 	}
 	path := home + "/.express-cli/.express.config.json"
 
-	contents, err := os.ReadFile(path)
+	sanitizedPath := p.Clean(path)
+	contents, err := os.ReadFile(sanitizedPath)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

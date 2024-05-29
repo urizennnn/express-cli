@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 
 	"github.com/urizennnn/express-cli/errors"
 )
@@ -19,7 +20,7 @@ type Dependency struct {
 	Dev          []string `json:"dev"`
 }
 
-func InstallDependenciesUnix(ext, manager, cwd string) {
+func InstallDependencies(ext, manager, cwd string) {
 	var jointPath string
 	switch ext {
 	case "js":
@@ -57,7 +58,8 @@ func InstallDependenciesUnix(ext, manager, cwd string) {
 				}
 
 				for _, dep := range dependency.Dependencies {
-					command := exec.Command(manager, "install", dep)
+					cleaned_Dep := filepath.Clean(dep)
+					command := exec.Command(manager, "install", cleaned_Dep)
 					command.Dir = cwd
 					err = command.Run()
 					if err != nil {
@@ -67,7 +69,8 @@ func InstallDependenciesUnix(ext, manager, cwd string) {
 				}
 
 				for _, dev := range dependency.Dev {
-					command := exec.Command(manager, "install", "--save-dev", dev)
+					cleaned_Dev := filepath.Clean(dev)
+					command := exec.Command(manager, "install", "--save-dev", cleaned_Dev)
 					command.Dir = cwd
 					err = command.Run()
 					if err != nil {

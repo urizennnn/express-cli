@@ -20,7 +20,7 @@ type Dependency struct {
 	Dev          []string `json:"dev"`
 }
 
-func InstallDependenciesUnix(ext, manager, cwd string) {
+func InstallDependencies(ext, manager, cwd string) {
 	var jointPath string
 	switch ext {
 	case "js":

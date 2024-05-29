@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 
 	"os"
@@ -44,8 +45,8 @@ func printVersion() {
 	} else {
 		file = data + "/version.js"
 	}
-
-	version, err := exec.Command("node", file).Output()
+	cleaned_File := filepath.Clean(file)
+	version, err := exec.Command("node", cleaned_File).Output()
 	errors.Check_Err(err)
 
 	fmt.Print("Express CLI is at version " + config.Green + string(version) + config.Green)
