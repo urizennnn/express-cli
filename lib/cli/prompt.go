@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/urizennnn/express-cli/errors"
 	"github.com/urizennnn/express-cli/lib/functions/config"
 )
 
@@ -194,7 +195,8 @@ func Skip() config.User {
 		os.Exit(1)
 	}
 	var lines config.User
-	json.Unmarshal(contents, &lines)
+	err = json.Unmarshal(contents, &lines)
+	errors.Check_Err(err)
 	return lines
 }
 

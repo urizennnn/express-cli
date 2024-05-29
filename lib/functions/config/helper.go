@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	Err "github.com/urizennnn/express-cli/errors"
+	"github.com/urizennnn/express-cli/lib/process"
+	"golang.org/x/term"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -12,15 +18,7 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/urizennnn/express-cli/lib/process"
-	"golang.org/x/term"
 )
-
-var quitTextStyle = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 
 type errMsg error
 
@@ -79,7 +77,8 @@ func Run(cwd, DirName, manager, language string) int {
 	go func() {
 		defer wg.Done()
 		defer cancel()
-		process.CopyFilesToCWD(cwd, DirName, manager, language, cancel)
+		err := process.CopyFilesToCWD(cwd, DirName, manager, language, cancel)
+		Err.Check_Err(err)
 	}()
 
 	wg.Add(1)

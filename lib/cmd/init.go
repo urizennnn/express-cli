@@ -19,7 +19,8 @@ var initCmd = &cobra.Command{
 		if len(args) == 0 {
 			errors.Check_Err(Err.New(config.Red + "No arguments provided" + config.Reset))
 			errors.Check_Err(Err.New(config.Red + "Turning off generators..." + config.Reset))
-			cmd.Help()
+			err := cmd.Help()
+			errors.Check_Err(err)
 			time.Sleep(3 * time.Second)
 			return
 		}
