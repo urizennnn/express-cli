@@ -13,15 +13,12 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v3
 
-    - name: Read README.md
-      id: read_readme
-      run: echo "README_CONTENT=$(cat README.md)" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: "README.md"
-        body: ${{ env.README_CONTENT }}
+        body: "README.md"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
