@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/urizennnn/express-cli/lib/functions/config"
@@ -21,7 +22,7 @@ const (
 	packageName = "@urizen/express-cli"
 )
 
-var linstalledVersion = Version()
+var installedVersion = strings.TrimSpace(Version())
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -30,7 +31,8 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-	if version != linstalledVersion {
+	version = strings.TrimSpace(version)
+	if version != installedVersion {
 		fmt.Printf(config.Red+"A new version of %s is available. Run `npm install -g %s` to update.\n"+config.Reset, packageName, packageName)
 	}
 	err = rootCmd.Execute()
