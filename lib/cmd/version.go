@@ -36,6 +36,22 @@ func getRootDir() (string, error) {
 	return "/usr/lib/node_modules/@urizen/express-cli", nil
 }
 
+func Version() string {
+	data, err := getRootDir()
+	errors.Check_Err(err)
+	var file string
+	if PLATFORM == "windows" {
+		file = data + "\\version.js"
+	} else {
+		file = data + "/version.js"
+	}
+	cleaned_File := filepath.Clean(file)
+	version, err := exec.Command("node", cleaned_File).Output()
+	errors.Check_Err(err)
+
+	return string(version)
+}
+
 func printVersion() {
 	data, err := getRootDir()
 	errors.Check_Err(err)
