@@ -5,7 +5,7 @@
         "http-status-codes",
         "morgan",
         "cors",
-        "eslint"
+        "eslint@8.56.0"
     ],
     "dev":[
         "nodemon",
