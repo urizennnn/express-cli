@@ -1,6 +1,6 @@
 {
   "name": "@urizen/express-cli",
-  "version": "2.3.4",
+  "version": "2.4.4",
   "license": "MIT",
   "bin": {
     "express": "bin/linux"
