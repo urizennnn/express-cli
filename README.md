@@ -8,6 +8,9 @@ The CLI has been redesigned with a new streamlined command for initializing proj
 ```express init <folder-name>```
 This will create a new application with default dependencies pre-installed for an Express application, as well as an initialized Git repository.
 
+## Type Definition 
+Added command to create and add types via ```express type <type-name>```
+
 ## Flags
 The --y flag can still be used to bypass prompts and use previous configurations.
 Warning: The CLI must be initialized through prompts before the --y flag can be used. Using the flag without prior initialization will result in a panic.
