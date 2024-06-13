@@ -1,4 +1,4 @@
-# Version 2.3 Release Notes
+# Version 2.4 Release Notes
 We are excited to announce a major update to our application, now rewritten entirely in Go to take advantage of its performance and cross-platform compiled binaries.
 
 ### New Features
