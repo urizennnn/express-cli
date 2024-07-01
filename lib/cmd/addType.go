@@ -10,7 +10,7 @@ import (
 
 var addTypeCmd = &cobra.Command{
 	Use:   "type <type-name>",
-	Short: "A brief description of your command",
+	Short: `creates a folder called types and add the type definition to the folder with the type name passed as the file name`,
 	Long:  `creates a folder called types and add the type definition to the folder with the type name passed as the file name`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
